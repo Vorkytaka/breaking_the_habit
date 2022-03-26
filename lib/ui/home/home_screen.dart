@@ -1,4 +1,5 @@
 import 'package:breaking_the_habit/model/habit.dart';
+import 'package:breaking_the_habit/ui/home/new_habit_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -9,6 +10,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(),
       body: Column(
         mainAxisSize: MainAxisSize.max,
@@ -52,7 +54,15 @@ class _HabitsList extends StatelessWidget {
         ListTile(
           leading: const Icon(Icons.add),
           title: const Text('Добавить привычку'),
-          onTap: () {},
+          onTap: () => showModalBottomSheet(
+            context: context,
+            backgroundColor: Colors.transparent,
+            isScrollControlled: true,
+            builder: (context) => SizedBox(
+              height: MediaQuery.of(context).size.height * 0.9,
+              child: const NewHabitScreen(),
+            ),
+          ),
         ),
       ],
     );
