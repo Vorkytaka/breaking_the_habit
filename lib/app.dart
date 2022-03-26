@@ -1,3 +1,4 @@
+import 'package:breaking_the_habit/ui/home/home_screen.dart';
 import 'package:flutter/material.dart';
 
 class App extends StatelessWidget {
@@ -7,7 +8,7 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       title: 'Flutter Demo',
-      home: Scaffold(),
+      home: HomeScreen(),
     );
   }
 }
