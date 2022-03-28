@@ -1,6 +1,7 @@
 import 'package:breaking_the_habit/bloc/auth/auth_bloc.dart';
 import 'package:breaking_the_habit/firebase_holder.dart';
 import 'package:breaking_the_habit/ui/home/home_screen.dart';
+import 'package:breaking_the_habit/ui/login/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -16,9 +17,9 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return OutDependencies(
       holder: firebaseHolder,
-      child: const MaterialApp(
+      builder: (context) => MaterialApp(
         title: 'Flutter Demo',
-        home: HomeScreen(),
+        home: context.watch<AuthBloc>().state.status == AuthStateStatus.auth ? const HomeScreen() : const LoginScreen(),
       ),
     );
   }
@@ -26,13 +27,16 @@ class App extends StatelessWidget {
 
 class OutDependencies extends StatelessWidget {
   final FirebaseHolder holder;
-  final Widget child;
+  final WidgetBuilder? builder;
+  final Widget? child;
 
   const OutDependencies({
     Key? key,
-    required this.child,
+    this.child,
+    this.builder,
     required this.holder,
-  }) : super(key: key);
+  })  : assert(child != null || builder != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +45,7 @@ class OutDependencies extends StatelessWidget {
       child: BlocProvider<AuthBloc>(
         create: (context) => AuthBloc(holder: holder),
         lazy: false,
-        child: child,
+        child: builder != null ? Builder(builder: builder!) : child!,
       ),
     );
   }
