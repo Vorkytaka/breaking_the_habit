@@ -1,5 +1,7 @@
+import 'package:breaking_the_habit/data/repository.dart';
 import 'package:breaking_the_habit/model/habit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'color_picker.dart';
 
@@ -92,15 +94,15 @@ class _NewHabitScreenState extends State<NewHabitScreen> {
                 builder: (context) => SizedBox(
                   height: 60,
                   child: ElevatedButton.icon(
-                    onPressed: () {
+                    onPressed: () async {
                       final form = Form.of(context)!;
                       if (form.validate()) {
-                        // form.save();
                         final color = _color;
                         final title = _titleController.text;
-
                         final habit = Habit(color: color, title: title);
-                        // todo: save
+
+                        // todo: move to bloc
+                        await context.read<Repository>().create(habit);
                         Navigator.of(context).pop();
                       }
                     },

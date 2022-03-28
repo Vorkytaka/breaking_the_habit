@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -5,11 +6,14 @@ import 'package:flutter/material.dart';
 class FirebaseHolder {
   final FirebaseApp app;
   final FirebaseAuth auth;
+  final FirebaseFirestore firestore;
 
   FirebaseHolder({
     required this.app,
     FirebaseAuth? auth,
-  }) : auth = auth ?? FirebaseAuth.instanceFor(app: app);
+    FirebaseFirestore? firestore,
+  })  : auth = auth ?? FirebaseAuth.instanceFor(app: app),
+        firestore = firestore ?? FirebaseFirestore.instanceFor(app: app);
 }
 
 class FirebaseHolderWidget extends InheritedWidget {

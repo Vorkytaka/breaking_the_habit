@@ -1,4 +1,5 @@
 import 'package:breaking_the_habit/bloc/auth/auth_bloc.dart';
+import 'package:breaking_the_habit/data/repository.dart';
 import 'package:breaking_the_habit/firebase_holder.dart';
 import 'package:breaking_the_habit/ui/home/home_screen.dart';
 import 'package:breaking_the_habit/ui/login/login_screen.dart';
@@ -42,10 +43,17 @@ class OutDependencies extends StatelessWidget {
   Widget build(BuildContext context) {
     return FirebaseHolderWidget(
       holder: holder,
-      child: BlocProvider<AuthBloc>(
-        create: (context) => AuthBloc(holder: holder),
+      child: RepositoryProvider<Repository>(
+        create: (context) => RepositoryImpl(
+          firestore: holder.firestore,
+          auth: holder.auth,
+        ),
         lazy: false,
-        child: builder != null ? Builder(builder: builder!) : child!,
+        child: BlocProvider<AuthBloc>(
+          create: (context) => AuthBloc(holder: holder),
+          lazy: false,
+          child: builder != null ? Builder(builder: builder!) : child!,
+        ),
       ),
     );
   }
