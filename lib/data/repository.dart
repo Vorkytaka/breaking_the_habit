@@ -12,7 +12,7 @@ abstract class Repository {
 
   Future update();
 
-  Future remove();
+  Future<void> delete(String id);
 }
 
 class RepositoryImpl implements Repository {
@@ -73,8 +73,13 @@ class RepositoryImpl implements Repository {
   }
 
   @override
-  Future remove() {
-    // TODO: implement remove
-    throw UnimplementedError();
+  Future<void> delete(String id) async {
+    final user = auth.currentUser;
+
+    if (user == null) {
+      throw Exception('Not auth');
+    }
+
+    await firestore.collection(user.uid).doc('habit').collection('habit').doc(id).delete();
   }
 }

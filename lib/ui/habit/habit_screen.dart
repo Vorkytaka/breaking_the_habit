@@ -1,4 +1,5 @@
 import 'package:breaking_the_habit/bloc/habit/habit_list_bloc.dart';
+import 'package:breaking_the_habit/data/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -26,6 +27,36 @@ class HabitScreen extends StatelessWidget {
         iconTheme: Theme.of(context).iconTheme.copyWith(
               color: isLight ? Colors.black : Colors.white,
             ),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              final bool accepted = (await showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text("Удаление привычки"),
+                      content: Text("Действительно удалить привычку ${habit.value.title}?"),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(false),
+                          child: const Text('Нет'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(true),
+                          child: const Text('Да'),
+                          style: TextButton.styleFrom(primary: Theme.of(context).errorColor),
+                        ),
+                      ],
+                    ),
+                  )) ??
+                  false;
+
+              if (accepted) {
+                context.read<Repository>().delete(habit.id);
+              }
+            },
+            icon: const Icon(Icons.delete),
+          ),
+        ],
       ),
     );
   }
