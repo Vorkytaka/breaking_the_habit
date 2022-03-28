@@ -1,4 +1,5 @@
 import 'package:breaking_the_habit/bloc/auth/auth_bloc.dart';
+import 'package:breaking_the_habit/bloc/habit/habit_list_bloc.dart';
 import 'package:breaking_the_habit/data/repository.dart';
 import 'package:breaking_the_habit/firebase_holder.dart';
 import 'package:breaking_the_habit/ui/home/home_screen.dart';
@@ -49,9 +50,17 @@ class OutDependencies extends StatelessWidget {
           auth: holder.auth,
         ),
         lazy: false,
-        child: BlocProvider<AuthBloc>(
-          create: (context) => AuthBloc(holder: holder),
-          lazy: false,
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (context) => HabitListBloc(repository: context.read()),
+              lazy: false,
+            ),
+            BlocProvider<AuthBloc>(
+              create: (context) => AuthBloc(holder: holder),
+              lazy: false,
+            ),
+          ],
           child: builder != null ? Builder(builder: builder!) : child!,
         ),
       ),

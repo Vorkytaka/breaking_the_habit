@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 abstract class Repository {
   Future<void> create(Habit habit);
 
+  Stream<List<IDModel<Habit>>> readAllStream();
+
   Future<List<IDModel<Habit>>> readAll();
 
   Future update();
@@ -26,7 +28,7 @@ class RepositoryImpl implements Repository {
   Future<void> create(Habit habit) async {
     final user = auth.currentUser;
 
-    if(user == null) {
+    if (user == null) {
       throw Exception('Not auth');
     }
 
@@ -36,6 +38,26 @@ class RepositoryImpl implements Repository {
         );
 
     await habitRef.add(habit);
+  }
+
+  @override
+  Stream<List<IDModel<Habit>>> readAllStream() {
+    final user = auth.currentUser;
+
+    if (user == null) {
+      throw Exception('Not auth');
+    }
+
+    return firestore
+        .collection(user.uid)
+        .doc('habit')
+        .collection('habit')
+        .withConverter<Habit>(
+          fromFirestore: (snapshot, _) => HabitJson.fromJson(snapshot.data()!),
+          toFirestore: (habit, _) => HabitJson.toJson(habit),
+        )
+        .snapshots()
+        .map((event) => event.docs.map((e) => IDModel(id: e.id, value: e.data())).toList(growable: false));
   }
 
   @override

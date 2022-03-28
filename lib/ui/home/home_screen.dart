@@ -1,6 +1,8 @@
+import 'package:breaking_the_habit/bloc/habit/habit_list_bloc.dart';
 import 'package:breaking_the_habit/model/habit.dart';
 import 'package:breaking_the_habit/ui/home/new_habit_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
@@ -44,12 +46,14 @@ class _HabitsList extends StatelessWidget {
     return ListView(
       physics: const ScrollPhysics(),
       children: [
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const ScrollPhysics(),
-          itemCount: 10,
-          // separatorBuilder: (context, i) => const SizedBox(height: 8),
-          itemBuilder: (context, i) => const SizedBox.shrink(),
+        BlocBuilder<HabitListBloc, HabitListState>(
+          builder: (context, state) => ListView.builder(
+            shrinkWrap: true,
+            physics: const ScrollPhysics(),
+            itemCount: state.habits.length,
+            // separatorBuilder: (context, i) => const SizedBox(height: 8),
+            itemBuilder: (context, i) => _HabitItem(habit: state.habits[i].value),
+          ),
         ),
         ListTile(
           leading: const Icon(Icons.add),
