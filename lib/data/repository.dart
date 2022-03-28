@@ -10,7 +10,7 @@ abstract class Repository {
 
   Future<List<IDModel<Habit>>> readAll();
 
-  Future update();
+  Future<void> update(IDModel<Habit> habit);
 
   Future<void> delete(String id);
 }
@@ -67,9 +67,19 @@ class RepositoryImpl implements Repository {
   }
 
   @override
-  Future update() {
-    // TODO: implement update
-    throw UnimplementedError();
+  Future<void> update(IDModel<Habit> habit) async {
+    final user = auth.currentUser;
+
+    if (user == null) {
+      throw Exception('Not auth');
+    }
+
+    await firestore
+        .collection(user.uid)
+        .doc('habit')
+        .collection('habit')
+        .doc(habit.id)
+        .update(HabitJson.toJson(habit.value));
   }
 
   @override

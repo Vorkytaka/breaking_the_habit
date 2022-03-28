@@ -3,6 +3,8 @@ import 'package:breaking_the_habit/data/repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'edit_habit_screen.dart';
+
 class HabitScreen extends StatelessWidget {
   final String habitId;
 
@@ -13,7 +15,13 @@ class HabitScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final habit = context.read<HabitListBloc>().state.habits.firstWhere((habit) => habit.id == habitId);
+    final habit = context.watch<HabitListBloc>().state.habits.firstWhereOrNull((habit) => habit.id == habitId);
+
+    // todo
+    if (habit == null) {
+      return const SizedBox();
+    }
+
     final luminance = habit.value.color.computeLuminance();
     final isLight = luminance > 0.5;
 
@@ -34,6 +42,24 @@ class HabitScreen extends StatelessWidget {
                 color: isLight ? Colors.black : Colors.white,
               ),
           actions: [
+            IconButton(
+              onPressed: () => Navigator.of(context).push(
+                PageRouteBuilder(
+                  pageBuilder: (context, _, __) => EditHabitScreen(
+                    habit: habit,
+                  ),
+                  transitionsBuilder: (context, anim, anim2, child) {
+                    return FadeTransition(
+                      opacity: anim,
+                      child: child,
+                    );
+                  },
+                  transitionDuration: const Duration(milliseconds: 100),
+                  reverseTransitionDuration: const Duration(milliseconds: 100),
+                ),
+              ),
+              icon: const Icon(Icons.edit),
+            ),
             IconButton(
               onPressed: () async {
                 final bool accepted = (await showDialog(
