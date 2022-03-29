@@ -4,8 +4,6 @@ import 'package:breaking_the_habit/model/habit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'color_picker.dart';
-
 class NewHabitScreen extends StatefulWidget {
   const NewHabitScreen({
     Key? key,
