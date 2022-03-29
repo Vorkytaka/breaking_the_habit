@@ -1,7 +1,7 @@
+import 'package:breaking_the_habit/color_dialog.dart';
 import 'package:breaking_the_habit/data/repository.dart';
 import 'package:breaking_the_habit/model/habit.dart';
 import 'package:breaking_the_habit/model/id_model.dart';
-import 'package:breaking_the_habit/ui/home/color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -48,28 +48,11 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
         backgroundColor: Colors.grey.shade50,
         iconTheme: Theme.of(context).iconTheme.copyWith(color: Colors.grey.shade900),
         actions: [
-          IconButton(
-            onPressed: () async {
-              final Color? selectedColor = await showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                builder: (context) => const ColorPickerScreen(),
-              );
-
-              if (selectedColor != null) {
-                setState(() {
-                  _color = selectedColor;
-                });
-              }
-            },
-            icon: Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: _color,
-                shape: BoxShape.circle,
-              ),
-            ),
+          ColorPickerButton(
+            currentColor: _color,
+            onSelected: (color) => setState(() {
+              _color = color;
+            }),
           ),
           IconButton(
             onPressed: () async {

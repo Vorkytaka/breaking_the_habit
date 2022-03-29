@@ -1,3 +1,4 @@
+import 'package:breaking_the_habit/color_dialog.dart';
 import 'package:breaking_the_habit/data/repository.dart';
 import 'package:breaking_the_habit/model/habit.dart';
 import 'package:flutter/material.dart';
@@ -64,28 +65,11 @@ class _NewHabitScreenState extends State<NewHabitScreen> {
                     ),
                   ),
                   const SizedBox(width: 16),
-                  InkResponse(
-                    onTap: () async {
-                      final Color? selectedColor = await showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        builder: (context) => const ColorPickerScreen(),
-                      );
-
-                      if (selectedColor != null) {
-                        setState(() {
-                          _color = selectedColor;
-                        });
-                      }
-                    },
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _color,
-                      ),
-                    ),
+                  ColorPickerButton(
+                    currentColor: _color,
+                    onSelected: (color) => setState(() {
+                      _color = color;
+                    }),
                   ),
                 ],
               ),
