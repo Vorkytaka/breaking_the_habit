@@ -35,43 +35,60 @@ class ColorPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     final CurveTween opacity = CurveTween(curve: const Interval(0.0, 1.0 / 3.0));
 
-    final child = Material(
-      type: MaterialType.card,
-      elevation: PopupMenuTheme.of(context).elevation ?? 8,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32))),
-      color: PopupMenuTheme.of(context).color,
-      clipBehavior: Clip.hardEdge,
-      child: Align(
-        widthFactor: 1,
-        heightFactor: 1,
-        child: SizedBox(
-          width: 200,
-          height: 200,
-          child: PageView.builder(
-            physics: const ScrollPhysics(),
-            itemCount: _defaultColors.length ~/ 9,
-            itemBuilder: (context, i) => GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(16),
-              itemCount: 9,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-              ),
-              itemBuilder: (context, j) => InkResponse(
-                onTap: () => Navigator.of(context).pop(_defaultColors[i * 9 + j]),
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: _defaultColors[i * 9 + j],
-                  ),
+    final child = DefaultTabController(
+      length: 2,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Material(
+            type: MaterialType.card,
+            elevation: PopupMenuTheme.of(context).elevation ?? 8,
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32))),
+            color: PopupMenuTheme.of(context).color,
+            clipBehavior: Clip.hardEdge,
+            child: Align(
+              widthFactor: 1,
+              heightFactor: 1,
+              child: SizedBox(
+                width: 200,
+                height: 200,
+                child: Builder(
+                  builder: (context) {
+                    return PageView.builder(
+                      physics: const ScrollPhysics(),
+                      itemCount: _defaultColors.length ~/ 9,
+                      onPageChanged: (page) => DefaultTabController.of(context)?.index = page,
+                      itemBuilder: (context, i) => GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.all(16),
+                        itemCount: 9,
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          mainAxisSpacing: 16,
+                          crossAxisSpacing: 16,
+                        ),
+                        itemBuilder: (context, j) => InkResponse(
+                          onTap: () => Navigator.of(context).pop(_defaultColors[i * 9 + j]),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: _defaultColors[i * 9 + j],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }
                 ),
               ),
             ),
           ),
-        ),
+          const SizedBox(height: 8),
+          TabPageSelector(),
+        ],
       ),
     );
 
@@ -108,6 +125,9 @@ class ColorRoute<T> extends PopupRoute<T> {
 
   @override
   Duration get transitionDuration => const Duration(milliseconds: 300);
+
+  @override
+  Duration get reverseTransitionDuration => const Duration(milliseconds: 200);
 
   @override
   Widget buildPage(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
