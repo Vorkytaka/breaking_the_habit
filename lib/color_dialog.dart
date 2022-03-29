@@ -24,11 +24,18 @@ const List<Color> _defaultColors = [
 ];
 
 class ColorPicker extends StatelessWidget {
-  const ColorPicker({Key? key}) : super(key: key);
+  final ColorRoute route;
+
+  const ColorPicker({
+    Key? key,
+    required this.route,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Material(
+    final CurveTween opacity = CurveTween(curve: const Interval(0.0, 1.0 / 3.0));
+
+    final child = Material(
       type: MaterialType.card,
       elevation: PopupMenuTheme.of(context).elevation ?? 8,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32))),
@@ -67,6 +74,17 @@ class ColorPicker extends StatelessWidget {
         ),
       ),
     );
+
+    return AnimatedBuilder(
+      animation: route.animation!,
+      builder: (context, child) {
+        return FadeTransition(
+          opacity: opacity.animate(route.animation!),
+          child: child,
+        );
+      },
+      child: child,
+    );
   }
 }
 
@@ -89,11 +107,11 @@ class ColorRoute<T> extends PopupRoute<T> {
   String? get barrierLabel => null;
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: 0);
+  Duration get transitionDuration => const Duration(milliseconds: 300);
 
   @override
   Widget buildPage(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
-    const child = ColorPicker();
+    final child = ColorPicker(route: this);
     final mediaQueryData = MediaQuery.of(context);
     return MediaQuery.removePadding(
       context: context,
