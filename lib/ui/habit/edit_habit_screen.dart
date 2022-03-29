@@ -38,6 +38,7 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: const CloseButton(),
         title: TextField(
           controller: _titleController,
           autofocus: true,
