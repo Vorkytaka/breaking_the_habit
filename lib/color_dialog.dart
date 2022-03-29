@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 const double _kMenuScreenPadding = 8.0;
@@ -45,89 +44,90 @@ class ColorRoute<T> extends PopupRoute<T> {
 
   @override
   Widget buildPage(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
-    return CustomSingleChildLayout(
-      delegate: _ColorRouteLayout(position: position),
-      child: Material(
-        type: MaterialType.card,
-        elevation: 3,
-        child: Align(
-          widthFactor: 1,
-          heightFactor: 1,
-          child: SizedBox(
-            width: 200,
-            height: 200,
-            child: PageView.builder(
-              physics: const ScrollPhysics(),
-              itemCount: _defaultColors.length ~/ 9,
-              itemBuilder: (context, i) => GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(16),
-                itemCount: 9,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  mainAxisSpacing: 16,
-                  crossAxisSpacing: 16,
-                ),
-                itemBuilder: (context, j) => InkResponse(
-                  onTap: () => Navigator.of(context).pop(_defaultColors[i * 9 + j]),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: _defaultColors[i * 9 + j],
+    final mediaQueryData = MediaQuery.of(context);
+    return MediaQuery.removePadding(
+      context: context,
+      removeBottom: true,
+      removeLeft: true,
+      removeRight: true,
+      removeTop: true,
+      child: Builder(builder: (context) {
+        return CustomSingleChildLayout(
+          delegate: _ColorRouteLayout(
+            position: position,
+            textDirection: Directionality.of(context),
+            padding: mediaQueryData.padding,
+          ),
+          child: Material(
+            type: MaterialType.card,
+            elevation: 3,
+            child: Align(
+              widthFactor: 1,
+              heightFactor: 1,
+              child: SizedBox(
+                width: 200,
+                height: 200,
+                child: PageView.builder(
+                  physics: const ScrollPhysics(),
+                  itemCount: _defaultColors.length ~/ 9,
+                  itemBuilder: (context, i) => GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(16),
+                    itemCount: 9,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 16,
+                      crossAxisSpacing: 16,
+                    ),
+                    itemBuilder: (context, j) => InkResponse(
+                      onTap: () => Navigator.of(context).pop(_defaultColors[i * 9 + j]),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _defaultColors[i * 9 + j],
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      }),
     );
   }
 }
 
 class _ColorRouteLayout extends SingleChildLayoutDelegate {
   final RelativeRect position;
+  final TextDirection textDirection;
+  final EdgeInsets padding;
 
   _ColorRouteLayout({
     required this.position,
+    required this.textDirection,
+    required this.padding,
   });
 
   @override
   BoxConstraints getConstraintsForChild(BoxConstraints constraints) {
     return BoxConstraints.loose(constraints.biggest).deflate(
-      const EdgeInsets.all(8),
+      const EdgeInsets.all(8) + padding,
     );
   }
 
   @override
   Offset getPositionForChild(Size size, Size childSize) {
-    // size: The size of the overlay.
-    // childSize: The size of the menu, when fully open, as determined by
-    // getConstraintsForChild.
-
-    final double buttonHeight = size.height - position.top - position.bottom;
-    // Find the ideal vertical position.
     double y = position.top;
-    // if (selectedItemIndex != null && itemSizes != null) {
-    //   double selectedItemOffset = _kMenuVerticalPadding;
-    //   for (int index = 0; index < selectedItemIndex!; index += 1) selectedItemOffset += itemSizes[index]!.height;
-    //   selectedItemOffset += itemSizes[selectedItemIndex!]!.height / 2;
-    //   y = y + buttonHeight / 2.0 - selectedItemOffset;
-    // }
 
-    // Find the ideal horizontal position.
     double x;
     if (position.left > position.right) {
-      // Menu button is closer to the right edge, so grow to the left, aligned to the right edge.
       x = size.width - position.right - childSize.width;
     } else if (position.left < position.right) {
-      // Menu button is closer to the left edge, so grow to the right, aligned to the left edge.
       x = position.left;
     } else {
-      // Menu button is equidistant from both edges, so grow in reading direction.
-      /*assert(textDirection != null);
       switch (textDirection) {
         case TextDirection.rtl:
           x = size.width - position.right - childSize.width;
@@ -135,20 +135,20 @@ class _ColorRouteLayout extends SingleChildLayoutDelegate {
         case TextDirection.ltr:
           x = position.left;
           break;
-      }*/
-      x = position.left;
+      }
     }
 
-    // Avoid going outside an area defined as the rectangle 8.0 pixels from the
-    // edge of the screen in every direction.
-    if (x < _kMenuScreenPadding)
-      x = _kMenuScreenPadding;
-    else if (x + childSize.width > size.width - _kMenuScreenPadding)
-      x = size.width - childSize.width - _kMenuScreenPadding;
-    if (y < _kMenuScreenPadding)
-      y = _kMenuScreenPadding;
-    else if (y + childSize.height > size.height - _kMenuScreenPadding)
-      y = size.height - _kMenuScreenPadding - childSize.height;
+    if (x < _kMenuScreenPadding + padding.left) {
+      x = _kMenuScreenPadding + padding.left;
+    } else if (x + childSize.width > size.width - _kMenuScreenPadding - padding.right) {
+      x = size.width - childSize.width - _kMenuScreenPadding - padding.right;
+    }
+
+    if (y < _kMenuScreenPadding + padding.top) {
+      y = _kMenuScreenPadding + padding.top;
+    } else if (y + childSize.height > size.height - _kMenuScreenPadding - padding.bottom) {
+      y = size.height - padding.bottom - _kMenuScreenPadding - childSize.height;
+    }
 
     return Offset(x, y);
   }
