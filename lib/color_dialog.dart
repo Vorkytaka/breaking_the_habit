@@ -23,11 +23,60 @@ const List<Color> _defaultColors = [
   Colors.blueGrey,
 ];
 
+class ColorPicker extends StatelessWidget {
+  const ColorPicker({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      type: MaterialType.card,
+      elevation: PopupMenuTheme.of(context).elevation ?? 8,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32))),
+      color: PopupMenuTheme.of(context).color,
+      clipBehavior: Clip.hardEdge,
+      child: Align(
+        widthFactor: 1,
+        heightFactor: 1,
+        child: SizedBox(
+          width: 200,
+          height: 200,
+          child: PageView.builder(
+            physics: const ScrollPhysics(),
+            itemCount: _defaultColors.length ~/ 9,
+            itemBuilder: (context, i) => GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(16),
+              itemCount: 9,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+              ),
+              itemBuilder: (context, j) => InkResponse(
+                onTap: () => Navigator.of(context).pop(_defaultColors[i * 9 + j]),
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _defaultColors[i * 9 + j],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class ColorRoute<T> extends PopupRoute<T> {
   final RelativeRect position;
+  final CapturedThemes capturedThemes;
 
   ColorRoute({
     required this.position,
+    required this.capturedThemes,
   });
 
   @override
@@ -44,6 +93,7 @@ class ColorRoute<T> extends PopupRoute<T> {
 
   @override
   Widget buildPage(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
+    const child = ColorPicker();
     final mediaQueryData = MediaQuery.of(context);
     return MediaQuery.removePadding(
       context: context,
@@ -58,42 +108,7 @@ class ColorRoute<T> extends PopupRoute<T> {
             textDirection: Directionality.of(context),
             padding: mediaQueryData.padding,
           ),
-          child: Material(
-            type: MaterialType.card,
-            elevation: 3,
-            child: Align(
-              widthFactor: 1,
-              heightFactor: 1,
-              child: SizedBox(
-                width: 200,
-                height: 200,
-                child: PageView.builder(
-                  physics: const ScrollPhysics(),
-                  itemCount: _defaultColors.length ~/ 9,
-                  itemBuilder: (context, i) => GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(16),
-                    itemCount: 9,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16,
-                    ),
-                    itemBuilder: (context, j) => InkResponse(
-                      onTap: () => Navigator.of(context).pop(_defaultColors[i * 9 + j]),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: _defaultColors[i * 9 + j],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+          child: capturedThemes.wrap(child),
         );
       }),
     );
@@ -162,8 +177,15 @@ class _ColorRouteLayout extends SingleChildLayoutDelegate {
 Future<Color?> showColorPicker({
   required BuildContext context,
   required RelativeRect position,
+  bool useRootNavigator = false,
 }) async {
-  return Navigator.of(context).push(ColorRoute(position: position));
+  final NavigatorState navigator = Navigator.of(context, rootNavigator: useRootNavigator);
+  return Navigator.of(context).push(
+    ColorRoute(
+      position: position,
+      capturedThemes: InheritedTheme.capture(from: context, to: navigator.context),
+    ),
+  );
 }
 
 class ColorPickerButton extends StatefulWidget {
