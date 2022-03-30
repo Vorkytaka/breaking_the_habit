@@ -121,7 +121,8 @@ class _Body extends StatelessWidget {
         final List<Activity> activities = [];
         for (final year in state.activities.values) {
           for (final month in year.values) {
-            for (final day in month!.values) {
+            if (month == null) continue;
+            for (final day in month.values) {
               for (final activity in day) {
                 if (activity.habitId == habit.id) {
                   activities.add(activity);

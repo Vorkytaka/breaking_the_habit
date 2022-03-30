@@ -62,7 +62,7 @@ class OutDependencies extends StatelessWidget {
               lazy: false,
             ),
             BlocProvider<ActivitiesBloc>(
-              create: (context) => ActivitiesBloc(repository: context.read())..addMonth(DateTime.now()),
+              create: (context) => ActivitiesBloc(repository: context.read())..setCurrentMonth(DateTime.now()),
               lazy: false,
             ),
           ],

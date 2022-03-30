@@ -1,3 +1,4 @@
+import 'package:breaking_the_habit/bloc/activities/activities_bloc.dart';
 import 'package:breaking_the_habit/bloc/habit/habit_list_bloc.dart';
 import 'package:breaking_the_habit/data/repository.dart';
 import 'package:breaking_the_habit/model/habit.dart';
@@ -30,6 +31,9 @@ class HomeScreen extends StatelessWidget {
                 lastDay: DateTime.now(),
                 firstDay: DateTime(1994),
                 focusedDay: DateTime.now(),
+                onPageChanged: (a) {
+                  context.read<ActivitiesBloc>().setCurrentMonth(a);
+                },
                 onDaySelected: (selectedDay, _) async {
                   final List<dynamic>? data = await showDialog(
                     context: context,

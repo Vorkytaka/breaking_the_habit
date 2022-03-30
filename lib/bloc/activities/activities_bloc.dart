@@ -6,16 +6,34 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ActivitiesBloc extends Cubit<ActivitiesState> {
   final Repository repository;
-  final Map<DateTime, StreamSubscription> _monthSubs = {};
+  StreamSubscription? prevMonthSubscription;
+  StreamSubscription? currentMonthSubscription;
+  StreamSubscription? nextMonthSubscription;
 
   ActivitiesBloc({
     required this.repository,
   }) : super(ActivitiesState());
 
-  void addMonth(DateTime datetime) {
-    final month = DateTime(datetime.year, datetime.month);
-    _monthSubs[month] = repository.streamAllActivitiesPerMonth(month).listen((event) {
-      emit(state.setActivities(datetime, event));
+  // todo: make it great again
+  void setCurrentMonth(DateTime datetime) {
+    final currentMonth = DateTime(datetime.year, datetime.month);
+    final prevMonth = currentMonth.subtract(const Duration(days: 1));
+    final nextMonth = currentMonth.add(const Duration(days: 32));
+
+    prevMonthSubscription?.cancel();
+    currentMonthSubscription?.cancel();
+    nextMonthSubscription?.cancel();
+
+    currentMonthSubscription = repository.streamAllActivitiesPerMonth(currentMonth).listen((event) {
+      emit(state.setActivities(currentMonth, event));
+    });
+
+    nextMonthSubscription = repository.streamAllActivitiesPerMonth(nextMonth).listen((event) {
+      emit(state.setActivities(nextMonth, event));
+    });
+
+    prevMonthSubscription = repository.streamAllActivitiesPerMonth(prevMonth).listen((event) {
+      emit(state.setActivities(prevMonth, event));
     });
   }
 }
