@@ -1,3 +1,4 @@
+import 'package:breaking_the_habit/bloc/activities/activities_bloc.dart';
 import 'package:breaking_the_habit/bloc/auth/auth_bloc.dart';
 import 'package:breaking_the_habit/bloc/habit/habit_list_bloc.dart';
 import 'package:breaking_the_habit/data/repository.dart';
@@ -58,6 +59,10 @@ class OutDependencies extends StatelessWidget {
             ),
             BlocProvider<AuthBloc>(
               create: (context) => AuthBloc(holder: holder),
+              lazy: false,
+            ),
+            BlocProvider<ActivitiesBloc>(
+              create: (context) => ActivitiesBloc(repository: context.read())..addMonth(DateTime.now()),
               lazy: false,
             ),
           ],
