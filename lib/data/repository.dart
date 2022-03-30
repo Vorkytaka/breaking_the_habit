@@ -13,6 +13,8 @@ abstract class Repository {
   Future<void> update(IDModel<Habit> habit);
 
   Future<void> delete(String id);
+
+  Future<void> addActivity(IDModel<Habit> habit, DateTime date, [DateTime? time]);
 }
 
 class RepositoryImpl implements Repository {
@@ -91,5 +93,33 @@ class RepositoryImpl implements Repository {
     }
 
     await firestore.collection(user.uid).doc('habit').collection('habit').doc(id).delete();
+  }
+
+  @override
+  Future<void> addActivity(IDModel<Habit> habit, DateTime datetime, [DateTime? time]) async {
+    final user = auth.currentUser;
+
+    if (user == null) {
+      throw Exception('Not auth');
+    }
+
+    final date = '${datetime.month}.${datetime.year}';
+
+    await firestore.collection(user.uid).doc(date).get().then((snapshot) async {
+      if (!snapshot.exists) {
+        await firestore.collection(user.uid).doc(date).set({});
+      }
+    });
+
+    await firestore.collection(user.uid).doc(date).update(
+      {
+        '${datetime.day}': FieldValue.arrayUnion([
+          {
+            'habit_id': habit.id,
+            'timestamp': time?.toUtc().millisecondsSinceEpoch,
+          }
+        ]),
+      },
+    );
   }
 }

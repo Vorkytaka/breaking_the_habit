@@ -1,9 +1,12 @@
 import 'package:breaking_the_habit/bloc/habit/habit_list_bloc.dart';
+import 'package:breaking_the_habit/data/repository.dart';
 import 'package:breaking_the_habit/model/habit.dart';
+import 'package:breaking_the_habit/model/id_model.dart';
 import 'package:breaking_the_habit/ui/habit/habit_screen.dart';
 import 'package:breaking_the_habit/ui/home/new_habit_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({
@@ -23,11 +26,22 @@ class HomeScreen extends StatelessWidget {
             flex: 4,
             child: Material(
               elevation: 3,
-              child: CalendarDatePicker(
-                initialDate: DateTime.now(),
-                firstDate: DateTime(1994),
-                lastDate: DateTime.now(),
-                onDateChanged: (_) {},
+              child: TableCalendar(
+                lastDay: DateTime.now(),
+                firstDay: DateTime(1994),
+                focusedDay: DateTime.now(),
+                onDaySelected: (selectedDay, _) async {
+                  final List<dynamic>? data = await showDialog(
+                    context: context,
+                    builder: (context) => _SelectActivity(selectedDate: selectedDay),
+                  );
+
+                  if (data != null) {
+                    final IDModel<Habit> habit = data[0];
+                    final DateTime? time = data[1];
+                    context.read<Repository>().addActivity(habit, selectedDay, time);
+                  }
+                },
               ),
             ),
           ),
@@ -111,6 +125,117 @@ class _HabitItem extends StatelessWidget {
       ),
       trailing: const Text('10 раз в день'),
       onTap: onTap,
+    );
+  }
+}
+
+class _SelectActivity extends StatefulWidget {
+  final DateTime selectedDate;
+
+  const _SelectActivity({
+    Key? key,
+    required this.selectedDate,
+  }) : super(key: key);
+
+  @override
+  State<_SelectActivity> createState() => _SelectActivityState();
+}
+
+class _SelectActivityState extends State<_SelectActivity> {
+  final now = DateTime.now();
+  DateTime? time;
+
+  @override
+  void initState() {
+    super.initState();
+    time = DateUtils.isSameDay(now, widget.selectedDate) ? now : null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      contentPadding: EdgeInsets.zero,
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Text('Выберите привычку'),
+          _TimeButton(
+            time: time,
+            onPressed: () async {
+              final selectedTime = await showTimePicker(
+                context: context,
+                initialTime: time != null ? TimeOfDay.fromDateTime(time!) : const TimeOfDay(hour: 12, minute: 00),
+              );
+
+              if (selectedTime != null) {
+                setState(() {
+                  time = widget.selectedDate.add(Duration(
+                    hours: selectedTime.hour,
+                    minutes: selectedTime.minute,
+                  ));
+                });
+              }
+            },
+          ),
+        ],
+      ),
+      content: BlocBuilder<HabitListBloc, HabitListState>(
+        builder: (context, state) {
+          return SizedBox(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              physics: const ScrollPhysics(),
+              padding: const EdgeInsets.only(
+                top: 20,
+                bottom: 24,
+              ),
+              itemCount: state.habits.length,
+              itemBuilder: (context, i) => ListTile(
+                onTap: () => Navigator.of(context).pop([state.habits[i], time]),
+                leading: Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: state.habits[i].value.color,
+                  ),
+                ),
+                title: Text(
+                  state.habits[i].value.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _TimeButton extends StatelessWidget {
+  final DateTime? time;
+  final VoidCallback? onPressed;
+
+  const _TimeButton({
+    Key? key,
+    required this.time,
+    this.onPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: onPressed,
+      icon: time == null
+          ? const Icon(Icons.watch_later)
+          : Text(
+              '${time!.hour}:${time!.minute}',
+              style: Theme.of(context).textTheme.subtitle2,
+            ),
     );
   }
 }
