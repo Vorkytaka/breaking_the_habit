@@ -106,15 +106,16 @@ class RepositoryImpl implements Repository {
       throw Exception('Not auth');
     }
 
-    final date = '${datetime.month}.${datetime.year}';
+    final docRef =
+        firestore.collection(user.uid).doc('${datetime.year}').collection('${datetime.year}').doc('${datetime.month}');
 
-    await firestore.collection(user.uid).doc(date).get().then((snapshot) async {
+    await docRef.get().then((snapshot) async {
       if (!snapshot.exists) {
-        await firestore.collection(user.uid).doc(date).set({});
+        await docRef.set({});
       }
     });
 
-    await firestore.collection(user.uid).doc(date).update(
+    await docRef.update(
       {
         '${datetime.day}': FieldValue.arrayUnion([
           {
@@ -134,17 +135,14 @@ class RepositoryImpl implements Repository {
       throw Exception('Not auth');
     }
 
-    final date = '${datetime.month}.${datetime.year}';
+    final docRef =
+        firestore.collection(user.uid).doc('${datetime.year}').collection('${datetime.year}').doc('${datetime.month}');
 
-    return firestore
-        .collection(user.uid)
-        .doc(date)
-        .snapshots()
-        .map((event) => event.data()?.map((key, value) => MapEntry(
-              int.parse(key),
-              value.map<Activity>((e) {
-                return ActivityJson.fromJson(e);
-              }).toList(),
-            )));
+    return docRef.snapshots().map((event) => event.data()?.map((key, value) => MapEntry(
+          int.parse(key),
+          value.map<Activity>((e) {
+            return ActivityJson.fromJson(e);
+          }).toList(),
+        )));
   }
 }
