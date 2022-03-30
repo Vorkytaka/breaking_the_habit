@@ -1,5 +1,9 @@
+import 'package:breaking_the_habit/bloc/activities/activities_bloc.dart';
 import 'package:breaking_the_habit/bloc/habit/habit_list_bloc.dart';
 import 'package:breaking_the_habit/data/repository.dart';
+import 'package:breaking_the_habit/model/activity.dart';
+import 'package:breaking_the_habit/model/habit.dart';
+import 'package:breaking_the_habit/model/id_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -90,6 +94,7 @@ class HabitScreen extends StatelessWidget {
             ),
           ],
         ),
+        body: _Body(habit: habit),
       ),
     );
   }
@@ -101,5 +106,39 @@ extension ListUtils<E> on List<E> {
       if (test(element)) return element;
     }
     return null;
+  }
+}
+
+class _Body extends StatelessWidget {
+  final IDModel<Habit> habit;
+
+  const _Body({Key? key, required this.habit}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ActivitiesBloc, ActivitiesState>(
+      builder: (context, state) {
+        final List<Activity> activities = [];
+        for (final year in state.activities.values) {
+          for (final month in year.values) {
+            for (final day in month!.values) {
+              for (final activity in day) {
+                if (activity.habitId == habit.id) {
+                  activities.add(activity);
+                }
+              }
+            }
+          }
+        }
+
+        return ListView.builder(
+          itemCount: activities.length,
+          itemBuilder: (context, i) => ListTile(
+            title: Text(habit.value.title),
+            trailing: activities[i].timestamp != null ? Text('${activities[i].timestamp}') : null,
+          ),
+        );
+      },
+    );
   }
 }
