@@ -3,7 +3,7 @@ import 'package:breaking_the_habit/data/repository.dart';
 import 'package:breaking_the_habit/model/habit.dart';
 import 'package:breaking_the_habit/model/id_model.dart';
 import 'package:breaking_the_habit/ui/habit/habit_screen.dart';
-import 'package:breaking_the_habit/ui/home/new_habit_screen.dart';
+import 'package:breaking_the_habit/ui/home/new_habit_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -82,15 +82,7 @@ class _HabitsList extends StatelessWidget {
         ListTile(
           leading: const Icon(Icons.add),
           title: const Text('Добавить привычку'),
-          onTap: () => showModalBottomSheet(
-            context: context,
-            backgroundColor: Colors.transparent,
-            isScrollControlled: true,
-            builder: (context) => SizedBox(
-              height: MediaQuery.of(context).size.height * 0.9,
-              child: const NewHabitScreen(),
-            ),
-          ),
+          onTap: () => showNewHabitDialog(context: context),
         ),
       ],
     );
