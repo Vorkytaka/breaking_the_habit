@@ -1,3 +1,4 @@
+import 'package:breaking_the_habit/model/activity.dart';
 import 'package:breaking_the_habit/model/habit.dart';
 import 'package:breaking_the_habit/model/id_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -16,7 +17,7 @@ abstract class Repository {
 
   Future<void> addActivity(IDModel<Habit> habit, DateTime date, [DateTime? time]);
 
-  Stream<Map<int, List<Map<String, dynamic>>>> streamAllActivitiesPerMonth(DateTime datetime);
+  Stream<Map<int, List<Activity>>?> streamAllActivitiesPerMonth(DateTime datetime);
 }
 
 class RepositoryImpl implements Repository {
@@ -125,7 +126,8 @@ class RepositoryImpl implements Repository {
     );
   }
 
-  Stream<Map<int, List<Map<String, dynamic>>>> streamAllActivitiesPerMonth(DateTime datetime) {
+  @override
+  Stream<Map<int, List<Activity>>?> streamAllActivitiesPerMonth(DateTime datetime) {
     final user = auth.currentUser;
 
     if (user == null) {
@@ -134,14 +136,15 @@ class RepositoryImpl implements Repository {
 
     final date = '${datetime.month}.${datetime.year}';
 
-    return firestore.collection(user.uid).doc(date).snapshots().map((event) => event.data()!.map((key, value) {
-          return MapEntry(
-            int.parse(key),
-            value.map<Map<String, dynamic>>((e) => <String, dynamic>{
-              'habit_id': e['habit_id'],
-              'timestamp': e['timestamp'],
-            }).toList(),
-          );
-        }));
+    return firestore
+        .collection(user.uid)
+        .doc(date)
+        .snapshots()
+        .map((event) => event.data()?.map((key, value) => MapEntry(
+              int.parse(key),
+              value.map<Activity>((e) {
+                return ActivityJson.fromJson(e);
+              }).toList(),
+            )));
   }
 }
