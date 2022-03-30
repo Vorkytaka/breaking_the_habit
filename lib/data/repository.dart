@@ -4,17 +4,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 abstract class Repository {
-  Future<void> create(Habit habit);
+  Future<void> createHabit(Habit habit);
 
-  Stream<List<IDModel<Habit>>> readAllStream();
+  Stream<List<IDModel<Habit>>> readAllHabitsStream();
 
-  Future<List<IDModel<Habit>>> readAll();
+  Future<List<IDModel<Habit>>> readAllHabits();
 
-  Future<void> update(IDModel<Habit> habit);
+  Future<void> updateHabit(IDModel<Habit> habit);
 
-  Future<void> delete(String id);
+  Future<void> deleteHabit(String id);
 
   Future<void> addActivity(IDModel<Habit> habit, DateTime date, [DateTime? time]);
+
+  Stream<Map<int, List<Map<String, dynamic>>>> streamAllActivitiesPerMonth(DateTime datetime);
 }
 
 class RepositoryImpl implements Repository {
@@ -27,7 +29,7 @@ class RepositoryImpl implements Repository {
   });
 
   @override
-  Future<void> create(Habit habit) async {
+  Future<void> createHabit(Habit habit) async {
     final user = auth.currentUser;
 
     if (user == null) {
@@ -43,7 +45,7 @@ class RepositoryImpl implements Repository {
   }
 
   @override
-  Stream<List<IDModel<Habit>>> readAllStream() {
+  Stream<List<IDModel<Habit>>> readAllHabitsStream() {
     final user = auth.currentUser;
 
     if (user == null) {
@@ -63,13 +65,13 @@ class RepositoryImpl implements Repository {
   }
 
   @override
-  Future<List<IDModel<Habit>>> readAll() {
+  Future<List<IDModel<Habit>>> readAllHabits() {
     // TODO: implement readAll
     throw UnimplementedError();
   }
 
   @override
-  Future<void> update(IDModel<Habit> habit) async {
+  Future<void> updateHabit(IDModel<Habit> habit) async {
     final user = auth.currentUser;
 
     if (user == null) {
@@ -85,7 +87,7 @@ class RepositoryImpl implements Repository {
   }
 
   @override
-  Future<void> delete(String id) async {
+  Future<void> deleteHabit(String id) async {
     final user = auth.currentUser;
 
     if (user == null) {
@@ -121,5 +123,25 @@ class RepositoryImpl implements Repository {
         ]),
       },
     );
+  }
+
+  Stream<Map<int, List<Map<String, dynamic>>>> streamAllActivitiesPerMonth(DateTime datetime) {
+    final user = auth.currentUser;
+
+    if (user == null) {
+      throw Exception('Not auth');
+    }
+
+    final date = '${datetime.month}.${datetime.year}';
+
+    return firestore.collection(user.uid).doc(date).snapshots().map((event) => event.data()!.map((key, value) {
+          return MapEntry(
+            int.parse(key),
+            value.map<Map<String, dynamic>>((e) => <String, dynamic>{
+              'habit_id': e['habit_id'],
+              'timestamp': e['timestamp'],
+            }).toList(),
+          );
+        }));
   }
 }

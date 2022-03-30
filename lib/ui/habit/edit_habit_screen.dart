@@ -66,7 +66,7 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
                 ),
               );
 
-              await context.read<Repository>().update(newHabit);
+              await context.read<Repository>().updateHabit(newHabit);
               Navigator.of(context).pop();
             },
             icon: const Icon(Icons.done),

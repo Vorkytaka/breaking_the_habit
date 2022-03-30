@@ -11,7 +11,7 @@ class HabitListBloc extends Cubit<HabitListState> {
   HabitListBloc({
     required Repository repository,
   }) : super(HabitListState()) {
-    _habitsList = repository.readAllStream().listen((habits) {
+    _habitsList = repository.readAllHabitsStream().listen((habits) {
       emit(HabitListState(habits: habits));
     });
   }

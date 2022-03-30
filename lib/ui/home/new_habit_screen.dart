@@ -84,7 +84,7 @@ class _NewHabitScreenState extends State<NewHabitScreen> {
                         final habit = Habit(color: color, title: title);
 
                         // todo: move to bloc
-                        await context.read<Repository>().create(habit);
+                        await context.read<Repository>().createHabit(habit);
                         Navigator.of(context).pop();
                       }
                     },

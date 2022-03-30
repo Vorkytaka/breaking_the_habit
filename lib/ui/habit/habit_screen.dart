@@ -83,7 +83,7 @@ class HabitScreen extends StatelessWidget {
                     false;
 
                 if (accepted) {
-                  context.read<Repository>().delete(habit.id);
+                  context.read<Repository>().deleteHabit(habit.id);
                 }
               },
               icon: const Icon(Icons.delete),
