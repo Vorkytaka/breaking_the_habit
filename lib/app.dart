@@ -27,14 +27,15 @@ class App extends StatelessWidget {
           brightness: Brightness.light,
           appBarTheme: AppBarTheme(
             elevation: 0,
-            actionsIconTheme: IconThemeData.fallback(),
+            actionsIconTheme: const IconThemeData.fallback(),
             backgroundColor: Colors.transparent,
             systemOverlayStyle: SystemUiOverlayStyle.light,
             titleTextStyle: Typography.material2018().black.merge(Typography.englishLike2018).headline6,
             toolbarTextStyle: Typography.material2018().black.merge(Typography.englishLike2018).bodyText2,
-            iconTheme: IconThemeData.fallback(),
+            iconTheme: const IconThemeData.fallback(),
           ),
         ),
+        builder: (context, child) => InnerDependecies(child: child!),
         home: context.watch<AuthBloc>().state.status == AuthStateStatus.auth ? const HomeScreen() : const LoginScreen(),
       ),
     );
@@ -83,5 +84,31 @@ class OutDependencies extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class InnerDependecies extends StatelessWidget {
+  final Widget child;
+
+  const InnerDependecies({
+    Key? key,
+    required this.child,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ScrollConfiguration(
+      behavior: const _ScrollBehavior(),
+      child: child,
+    );
+  }
+}
+
+class _ScrollBehavior extends ScrollBehavior {
+  const _ScrollBehavior() : super();
+
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) {
+    return const BouncingScrollPhysics();
   }
 }
