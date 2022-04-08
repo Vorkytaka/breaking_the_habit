@@ -5,6 +5,7 @@ import 'package:breaking_the_habit/model/habit.dart';
 import 'package:breaking_the_habit/model/id_model.dart';
 import 'package:breaking_the_habit/ui/habit/habit_screen.dart';
 import 'package:breaking_the_habit/ui/home/new_habit_dialog.dart';
+import 'package:breaking_the_habit/utils/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -63,14 +64,18 @@ class _HabitsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 8,
+      ),
       physics: const ScrollPhysics(),
       children: [
         BlocBuilder<HabitListBloc, HabitListState>(
-          builder: (context, state) => ListView.builder(
+          builder: (context, state) => ListView.separated(
             shrinkWrap: true,
             physics: const ScrollPhysics(),
             itemCount: state.habits.length,
-            // separatorBuilder: (context, i) => const SizedBox(height: 8),
+            separatorBuilder: (context, i) => const SizedBox(height: 8),
             itemBuilder: (context, i) => _HabitItem(
               habit: state.habits[i].value,
               onTap: () => Navigator.of(context).push(
@@ -83,7 +88,9 @@ class _HabitsList extends StatelessWidget {
             ),
           ),
         ),
+        const SizedBox(height: 8),
         ListTile(
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(28))),
           leading: const Icon(Icons.add),
           title: const Text('Добавить привычку'),
           onTap: () => showNewHabitDialog(context: context),
@@ -106,6 +113,8 @@ class _HabitItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(28))),
+      tileColor: habit.color.lighten(70),
       leading: Container(
         width: 24,
         height: 24,
