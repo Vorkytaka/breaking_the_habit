@@ -97,7 +97,7 @@ class _HabitsList extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         DottedBorder(
-          radius: Radius.circular(28),
+          radius: const Radius.circular(28),
           borderType: BorderType.RRect,
           padding: EdgeInsets.zero,
           color: Theme.of(context).disabledColor,
@@ -128,24 +128,28 @@ class _HabitItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(28))),
-      tileColor: habit.color.lighten(70),
-      leading: Container(
-        width: 24,
-        height: 24,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: habit.color,
+    return Material(
+      borderRadius: BorderRadius.all(Radius.circular(28)),
+      elevation: 2,
+      child: ListTile(
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(28))),
+        tileColor: habit.color.lighten(70),
+        leading: Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: habit.color,
+          ),
         ),
+        title: Text(
+          habit.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        trailing: const Text('10 раз в день'),
+        onTap: onTap,
       ),
-      title: Text(
-        habit.title,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-      trailing: const Text('10 раз в день'),
-      onTap: onTap,
     );
   }
 }
