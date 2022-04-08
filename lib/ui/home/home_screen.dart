@@ -241,6 +241,13 @@ class _SelectActivityState extends State<_SelectActivity> {
               _TimeButton(
                 time: time,
                 onPressed: () async {
+                  if(time != null) {
+                    setState(() {
+                      time = null;
+                    });
+                    return;
+                  }
+
                   final selectedTime = await showTimePicker(
                     context: context,
                     initialTime: time != null ? TimeOfDay.fromDateTime(time!) : const TimeOfDay(hour: 12, minute: 00),
@@ -326,7 +333,7 @@ class _TimeButton extends StatelessWidget {
           onTap: onPressed,
           borderRadius: const BorderRadius.all(Radius.circular(5)),
           child: time == null
-              ? const Icon(Icons.watch_later)
+              ? const Icon(Icons.schedule)
               : Center(
                   child: Text(
                     MaterialLocalizations.of(context).formatTimeOfDay(TimeOfDay.fromDateTime(time!)),
