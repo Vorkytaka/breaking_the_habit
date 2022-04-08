@@ -271,6 +271,7 @@ class _ColorPickerButtonState extends State<ColorPickerButton> {
   @override
   Widget build(BuildContext context) {
     return IconButton(
+      splashRadius: 40,
       onPressed: showButtonMenu,
       icon: Container(
         width: 40,

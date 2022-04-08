@@ -51,7 +51,7 @@ class _NewHabitDialogState extends State<NewHabitDialog> {
         removeLeft: true,
         context: context,
         child: Material(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           clipBehavior: Clip.hardEdge,
           child: Padding(
             padding: const EdgeInsets.symmetric(
@@ -90,6 +90,7 @@ class _NewHabitDialogState extends State<NewHabitDialog> {
                   ),
                   const SizedBox(width: 16),
                   IconButton(
+                    splashRadius: 40,
                     onPressed: _loading
                         ? null
                         : () async {

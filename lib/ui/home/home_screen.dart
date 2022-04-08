@@ -3,6 +3,7 @@ import 'package:breaking_the_habit/bloc/habit/habit_list_bloc.dart';
 import 'package:breaking_the_habit/data/repository.dart';
 import 'package:breaking_the_habit/model/habit.dart';
 import 'package:breaking_the_habit/model/id_model.dart';
+import 'package:breaking_the_habit/ui/calendar.dart';
 import 'package:breaking_the_habit/ui/habit/habit_screen.dart';
 import 'package:breaking_the_habit/ui/home/new_habit_dialog.dart';
 import 'package:breaking_the_habit/utils/colors.dart';
@@ -75,7 +76,7 @@ class _DraggableHabitsListState extends State<_DraggableHabitsList> {
     return NotificationListener<DraggableScrollableNotification>(
       onNotification: (notification) {
         final onTop = notification.extent == notification.maxExtent;
-        if(onTop != isOnTop) {
+        if (onTop != isOnTop) {
           isOnTop = onTop;
           setState(() {});
         }
@@ -88,9 +89,6 @@ class _DraggableHabitsListState extends State<_DraggableHabitsList> {
         builder: (context, controller) => Material(
           elevation: isOnTop ? 0 : 8,
           clipBehavior: Clip.hardEdge,
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(isOnTop ? 0 : 32),
-          ),
           child: _HabitsList(
             controller: controller,
           ),
@@ -113,7 +111,7 @@ class _HabitsList extends StatelessWidget {
         horizontal: 8,
         vertical: 10,
       ),
-      physics: const ScrollPhysics(),
+      physics: const BouncingScrollPhysics(),
       children: [
         BlocBuilder<HabitListBloc, HabitListState>(
           builder: (context, state) => ListView.separated(
@@ -135,13 +133,13 @@ class _HabitsList extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         DottedBorder(
-          radius: const Radius.circular(28),
+          radius: const Radius.circular(6),
           borderType: BorderType.RRect,
           padding: EdgeInsets.zero,
           color: Theme.of(context).disabledColor,
-          dashPattern: [8, 8],
+          dashPattern: const [8, 8],
           child: ListTile(
-            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(28))),
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
             leading: const Icon(Icons.add),
             title: const Text('Добавить привычку'),
             textColor: Theme.of(context).disabledColor,
@@ -167,10 +165,10 @@ class _HabitItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      borderRadius: BorderRadius.all(Radius.circular(28)),
+      borderRadius: const BorderRadius.all(Radius.circular(5)),
       elevation: 2,
       child: ListTile(
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(28))),
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
         tileColor: habit.color.lighten(70),
         leading: Container(
           width: 24,
