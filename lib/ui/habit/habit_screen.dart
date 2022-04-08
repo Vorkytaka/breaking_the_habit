@@ -42,7 +42,7 @@ class HabitScreen extends StatelessWidget {
           titleTextStyle: Theme.of(context).textTheme.headline6?.copyWith(
                 color: isLight ? Colors.black : Colors.white,
               ),
-          iconTheme: Theme.of(context).iconTheme.copyWith(
+          actionsIconTheme: Theme.of(context).iconTheme.copyWith(
                 color: isLight ? Colors.black : Colors.white,
               ),
           actions: [
