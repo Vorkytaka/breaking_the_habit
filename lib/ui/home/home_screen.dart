@@ -47,7 +47,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     this.month = month;
                     setState(() {});
                   },
-                  onDayTap: (day) {},
+                  onDayTap: (day) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => _SelectActivity(
+                        selectedDate: day,
+                      ),
+                    );
+                  },
                 ),
               ),
               const Spacer(flex: 3),
@@ -211,64 +218,88 @@ class _SelectActivityState extends State<_SelectActivity> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      contentPadding: EdgeInsets.zero,
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
+    return Dialog(
+      insetPadding: EdgeInsets.zero,
+      backgroundColor: Colors.transparent,
+      child: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
         children: [
-          const Text('Выберите привычку'),
-          _TimeButton(
-            time: time,
-            onPressed: () async {
-              final selectedTime = await showTimePicker(
-                context: context,
-                initialTime: time != null ? TimeOfDay.fromDateTime(time!) : const TimeOfDay(hour: 12, minute: 00),
-              );
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: ListTile(
+                  tileColor: Theme.of(context).scaffoldBackgroundColor,
+                  title: const Text('Выберите привычку'),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              _TimeButton(
+                time: time,
+                onPressed: () async {
+                  final selectedTime = await showTimePicker(
+                    context: context,
+                    initialTime: time != null ? TimeOfDay.fromDateTime(time!) : const TimeOfDay(hour: 12, minute: 00),
+                  );
 
-              if (selectedTime != null) {
-                setState(() {
-                  time = widget.selectedDate.add(Duration(
-                    hours: selectedTime.hour,
-                    minutes: selectedTime.minute,
-                  ));
-                });
-              }
+                  if (selectedTime != null) {
+                    setState(() {
+                      time = widget.selectedDate.add(Duration(
+                        hours: selectedTime.hour,
+                        minutes: selectedTime.minute,
+                      ));
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
+          BlocBuilder<HabitListBloc, HabitListState>(
+            builder: (context, state) {
+              return SizedBox(
+                width: double.maxFinite,
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  physics: const ScrollPhysics(),
+                  padding: const EdgeInsets.only(
+                    top: 20,
+                    bottom: 24,
+                    left: 8,
+                    right: 8,
+                  ),
+                  itemCount: state.habits.length,
+                  separatorBuilder: (context, i) => const SizedBox(height: 8),
+                  itemBuilder: (context, i) => Material(
+                    borderRadius: const BorderRadius.all(Radius.circular(5)),
+                    elevation: 2,
+                    child: ListTile(
+                      onTap: () => Navigator.of(context).pop([state.habits[i], time]),
+                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
+                      tileColor: state.habits[i].value.color.lighten(70),
+                      leading: Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: state.habits[i].value.color,
+                        ),
+                      ),
+                      title: Text(
+                        state.habits[i].value.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                ),
+              );
             },
           ),
         ],
-      ),
-      content: BlocBuilder<HabitListBloc, HabitListState>(
-        builder: (context, state) {
-          return SizedBox(
-            width: double.maxFinite,
-            child: ListView.builder(
-              shrinkWrap: true,
-              physics: const ScrollPhysics(),
-              padding: const EdgeInsets.only(
-                top: 20,
-                bottom: 24,
-              ),
-              itemCount: state.habits.length,
-              itemBuilder: (context, i) => ListTile(
-                onTap: () => Navigator.of(context).pop([state.habits[i], time]),
-                leading: Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: state.habits[i].value.color,
-                  ),
-                ),
-                title: Text(
-                  state.habits[i].value.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ),
-          );
-        },
       ),
     );
   }
@@ -286,14 +317,24 @@ class _TimeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: onPressed,
-      icon: time == null
-          ? const Icon(Icons.watch_later)
-          : Text(
-              '${time!.hour}:${time!.minute}',
-              style: Theme.of(context).textTheme.subtitle2,
-            ),
+    return SizedBox(
+      height: 56,
+      width: 56,
+      child: Material(
+        borderRadius: const BorderRadius.all(Radius.circular(5)),
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: const BorderRadius.all(Radius.circular(5)),
+          child: time == null
+              ? const Icon(Icons.watch_later)
+              : Center(
+                  child: Text(
+                    MaterialLocalizations.of(context).formatTimeOfDay(TimeOfDay.fromDateTime(time!)),
+                    style: Theme.of(context).textTheme.caption,
+                  ),
+                ),
+        ),
+      ),
     );
   }
 }
