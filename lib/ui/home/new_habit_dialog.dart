@@ -5,8 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 Future<void> showNewHabitDialog({required BuildContext context}) async {
-  await showDialog(
+  await showModalBottomSheet(
     context: context,
+    enableDrag: false,
+    isScrollControlled: true,
+    isDismissible: true,
+    backgroundColor: Colors.transparent,
     builder: (context) => const NewHabitDialog(),
   );
 }
@@ -34,71 +38,80 @@ class _NewHabitDialogState extends State<NewHabitDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 16,
-      ),
-      alignment: Alignment.bottomCenter,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
-      clipBehavior: Clip.hardEdge,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: 8,
-          horizontal: 8,
-        ),
-        child: Form(
-          key: _formKey,
-          child: Row(
-            children: [
-              ColorPickerButton(
-                currentColor: _color,
-                onSelected: (color) => setState(() {
-                  _color = color;
-                }),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: TextFormField(
-                  controller: _titleController,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    hintText: 'Привычка',
+    return Padding(
+      padding: MediaQuery.of(context).viewInsets +
+          const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 16,
+          ),
+      child: MediaQuery.removeViewInsets(
+        removeTop: true,
+        removeRight: true,
+        removeBottom: true,
+        removeLeft: true,
+        context: context,
+        child: Material(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+          clipBehavior: Clip.hardEdge,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: 8,
+              horizontal: 8,
+            ),
+            child: Form(
+              key: _formKey,
+              child: Row(
+                children: [
+                  ColorPickerButton(
+                    currentColor: _color,
+                    onSelected: (color) => setState(() {
+                      _color = color;
+                    }),
                   ),
-                  maxLines: 1,
-                  autofocus: true,
-                  textCapitalization: TextCapitalization.sentences,
-                  validator: (str) {
-                    if (str == null || str.isEmpty) {
-                      return 'Заполните название';
-                    }
-
-                    return null;
-                  },
-                ),
-              ),
-              const SizedBox(width: 16),
-              IconButton(
-                onPressed: _loading
-                    ? null
-                    : () async {
-                        final form = _formKey.currentState!;
-                        if (form.validate()) {
-                          setState(() => _loading = true);
-
-                          final color = _color;
-                          final title = _titleController.text;
-                          final habit = Habit(color: color, title: title);
-
-                          // todo: move to bloc
-                          await context.read<Repository>().createHabit(habit);
-                          setState(() => _loading = false);
-                          Navigator.of(context).pop();
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _titleController,
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        hintText: 'Привычка',
+                      ),
+                      maxLines: 1,
+                      autofocus: true,
+                      textCapitalization: TextCapitalization.sentences,
+                      validator: (str) {
+                        if (str == null || str.isEmpty) {
+                          return 'Заполните название';
                         }
+
+                        return null;
                       },
-                icon: _loading ? CircularProgressIndicator(color: _color) : const Icon(Icons.done),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  IconButton(
+                    onPressed: _loading
+                        ? null
+                        : () async {
+                            final form = _formKey.currentState!;
+                            if (form.validate()) {
+                              setState(() => _loading = true);
+
+                              final color = _color;
+                              final title = _titleController.text;
+                              final habit = Habit(color: color, title: title);
+
+                              // todo: move to bloc
+                              await context.read<Repository>().createHabit(habit);
+                              setState(() => _loading = false);
+                              Navigator.of(context).pop();
+                            }
+                          },
+                    icon: _loading ? CircularProgressIndicator(color: _color) : const Icon(Icons.done),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
