@@ -2,10 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 class Calendar extends StatelessWidget {
+  final DateTime from;
+  final DateTime to;
+  final ValueChanged<DateTime>? onMonthChanged;
+
+  Calendar({
+    Key? key,
+    DateTime? from,
+    DateTime? to,
+    this.onMonthChanged,
+  })  : from = from ?? DateTime(1994, 04, 20),
+        to = to ?? DateTime.now(),
+        super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final monthCount = DateUtils.monthDelta(from, to);
+    final today = DateTime.now();
+
+    final _pageController = PageController(initialPage: monthCount);
+
+    return PageView.builder(
+      itemCount: monthCount,
+      controller: _pageController,
+      onPageChanged: (i) => onMonthChanged?.call(DateTime(from.year, from.month + i +1)),
+      itemBuilder: (context, i) => MonthWidget(
+        month: DateTime(from.year, from.month + i + 1),
+        today: today,
+      ),
+    );
+  }
+}
+
+class MonthWidget extends StatelessWidget {
   final DateTime month;
   final DateTime today;
 
-  const Calendar({
+  const MonthWidget({
     Key? key,
     required this.month,
     required this.today,
@@ -50,7 +83,7 @@ class Calendar extends StatelessWidget {
       final bool isDisabled = day < 1 || day > daysInMonth || today.isBefore(dayToBuild);
 
       final Color? dayColor;
-      if(isDisabled) {
+      if (isDisabled) {
         dayColor = theme.disabledColor;
       } else {
         dayColor = theme.colorScheme.onSurface;
@@ -63,7 +96,7 @@ class Calendar extends StatelessWidget {
         ),
       );
 
-      if(!isDisabled) {
+      if (!isDisabled) {
         dayWidget = InkResponse(
           onTap: () {},
           child: dayWidget,
