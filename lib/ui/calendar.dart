@@ -5,12 +5,14 @@ class Calendar extends StatelessWidget {
   final DateTime from;
   final DateTime to;
   final ValueChanged<DateTime>? onMonthChanged;
+  final ValueChanged<DateTime>? onDayTap;
 
   Calendar({
     Key? key,
     DateTime? from,
     DateTime? to,
     this.onMonthChanged,
+    this.onDayTap,
   })  : from = from ?? DateTime(1994, 04, 20),
         to = to ?? DateTime.now(),
         super(key: key);
@@ -25,9 +27,10 @@ class Calendar extends StatelessWidget {
     return PageView.builder(
       itemCount: monthCount,
       controller: _pageController,
-      onPageChanged: (i) => onMonthChanged?.call(DateTime(from.year, from.month + i +1)),
+      onPageChanged: (i) => onMonthChanged?.call(DateTime(from.year, from.month + i + 1)),
       itemBuilder: (context, i) => MonthWidget(
         month: DateTime(from.year, from.month + i + 1),
+        onDayTap: onDayTap,
         today: today,
       ),
     );
@@ -37,11 +40,13 @@ class Calendar extends StatelessWidget {
 class MonthWidget extends StatelessWidget {
   final DateTime month;
   final DateTime today;
+  final ValueChanged<DateTime>? onDayTap;
 
   const MonthWidget({
     Key? key,
     required this.month,
     required this.today,
+    this.onDayTap,
   }) : super(key: key);
 
   List<Widget> _dayHeaders(TextStyle? headerStyle, MaterialLocalizations localizations) {
@@ -98,7 +103,7 @@ class MonthWidget extends StatelessWidget {
 
       if (!isDisabled) {
         dayWidget = InkResponse(
-          onTap: () {},
+          onTap: onDayTap != null ? () => onDayTap!.call(dayToBuild) : null,
           child: dayWidget,
         );
       }
