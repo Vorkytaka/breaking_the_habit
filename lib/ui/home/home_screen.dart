@@ -23,54 +23,92 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('Breaking the Habit'),
       ),
-      body: Column(
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: Stack(
         children: [
-          Expanded(
-            flex: 4,
-            child: TableCalendar(
-              lastDay: DateTime.now(),
-              firstDay: DateTime(1994),
-              focusedDay: DateTime.now(),
-              onPageChanged: (a) {
-                context.read<ActivitiesBloc>().setCurrentMonth(a);
-              },
-              onDaySelected: (selectedDay, _) async {
-                final List<dynamic>? data = await showDialog(
-                  context: context,
-                  builder: (context) => _SelectActivity(selectedDate: selectedDay),
-                );
+          Column(
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                flex: 4,
+                child: TableCalendar(
+                  lastDay: DateTime.now(),
+                  firstDay: DateTime(1994),
+                  focusedDay: DateTime.now(),
+                  onPageChanged: (a) {
+                    context.read<ActivitiesBloc>().setCurrentMonth(a);
+                  },
+                  onDaySelected: (selectedDay, _) async {
+                    final List<dynamic>? data = await showDialog(
+                      context: context,
+                      builder: (context) => _SelectActivity(selectedDate: selectedDay),
+                    );
 
-                if (data != null) {
-                  final IDModel<Habit> habit = data[0];
-                  final DateTime? time = data[1];
-                  context.read<Repository>().addActivity(habit, selectedDay, time);
-                }
-              },
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Material(
-              elevation: 8,
-              clipBehavior: Clip.hardEdge,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(32),
+                    if (data != null) {
+                      final IDModel<Habit> habit = data[0];
+                      final DateTime? time = data[1];
+                      context.read<Repository>().addActivity(habit, selectedDay, time);
+                    }
+                  },
+                ),
               ),
-              child: _HabitsList(),
-            ),
+              const Spacer(flex: 3),
+            ],
           ),
+          _DraggableHabitsList(),
         ],
       ),
     );
   }
 }
 
+class _DraggableHabitsList extends StatefulWidget {
+  @override
+  State<_DraggableHabitsList> createState() => _DraggableHabitsListState();
+}
+
+class _DraggableHabitsListState extends State<_DraggableHabitsList> {
+  bool isOnTop = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return NotificationListener<DraggableScrollableNotification>(
+      onNotification: (notification) {
+        final onTop = notification.extent == notification.maxExtent;
+        if(onTop != isOnTop) {
+          isOnTop = onTop;
+          setState(() {});
+        }
+        return false;
+      },
+      child: DraggableScrollableSheet(
+        initialChildSize: 3 / 7,
+        minChildSize: 3 / 7,
+        maxChildSize: 1,
+        builder: (context, controller) => Material(
+          elevation: isOnTop ? 0 : 8,
+          clipBehavior: Clip.hardEdge,
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(isOnTop ? 0 : 32),
+          ),
+          child: _HabitsList(
+            controller: controller,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _HabitsList extends StatelessWidget {
+  final ScrollController? controller;
+
+  const _HabitsList({Key? key, this.controller}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return ListView(
+      controller: controller,
       padding: const EdgeInsets.symmetric(
         horizontal: 8,
         vertical: 10,
