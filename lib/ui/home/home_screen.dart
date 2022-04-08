@@ -26,33 +26,36 @@ class HomeScreen extends StatelessWidget {
         children: [
           Expanded(
             flex: 4,
-            child: Material(
-              elevation: 3,
-              child: TableCalendar(
-                lastDay: DateTime.now(),
-                firstDay: DateTime(1994),
-                focusedDay: DateTime.now(),
-                onPageChanged: (a) {
-                  context.read<ActivitiesBloc>().setCurrentMonth(a);
-                },
-                onDaySelected: (selectedDay, _) async {
-                  final List<dynamic>? data = await showDialog(
-                    context: context,
-                    builder: (context) => _SelectActivity(selectedDate: selectedDay),
-                  );
+            child: TableCalendar(
+              lastDay: DateTime.now(),
+              firstDay: DateTime(1994),
+              focusedDay: DateTime.now(),
+              onPageChanged: (a) {
+                context.read<ActivitiesBloc>().setCurrentMonth(a);
+              },
+              onDaySelected: (selectedDay, _) async {
+                final List<dynamic>? data = await showDialog(
+                  context: context,
+                  builder: (context) => _SelectActivity(selectedDate: selectedDay),
+                );
 
-                  if (data != null) {
-                    final IDModel<Habit> habit = data[0];
-                    final DateTime? time = data[1];
-                    context.read<Repository>().addActivity(habit, selectedDay, time);
-                  }
-                },
-              ),
+                if (data != null) {
+                  final IDModel<Habit> habit = data[0];
+                  final DateTime? time = data[1];
+                  context.read<Repository>().addActivity(habit, selectedDay, time);
+                }
+              },
             ),
           ),
           Expanded(
             flex: 3,
-            child: _HabitsList(),
+            child: Material(
+              elevation: 8,
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(32),
+              ),
+              child: _HabitsList(),
+            ),
           ),
         ],
       ),
@@ -65,8 +68,8 @@ class _HabitsList extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 8,
+        horizontal: 8,
+        vertical: 10,
       ),
       physics: const ScrollPhysics(),
       children: [
