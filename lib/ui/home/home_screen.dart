@@ -6,6 +6,7 @@ import 'package:breaking_the_habit/model/id_model.dart';
 import 'package:breaking_the_habit/ui/habit/habit_screen.dart';
 import 'package:breaking_the_habit/ui/home/new_habit_dialog.dart';
 import 'package:breaking_the_habit/utils/colors.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -53,7 +54,8 @@ class HomeScreen extends StatelessWidget {
             flex: 3,
             child: Material(
               elevation: 8,
-              borderRadius: BorderRadius.vertical(
+              clipBehavior: Clip.hardEdge,
+              borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(32),
               ),
               child: _HabitsList(),
@@ -94,11 +96,20 @@ class _HabitsList extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        ListTile(
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(28))),
-          leading: const Icon(Icons.add),
-          title: const Text('Добавить привычку'),
-          onTap: () => showNewHabitDialog(context: context),
+        DottedBorder(
+          radius: Radius.circular(28),
+          borderType: BorderType.RRect,
+          padding: EdgeInsets.zero,
+          color: Theme.of(context).disabledColor,
+          dashPattern: [8, 8],
+          child: ListTile(
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(28))),
+            leading: const Icon(Icons.add),
+            title: const Text('Добавить привычку'),
+            textColor: Theme.of(context).disabledColor,
+            iconColor: Theme.of(context).disabledColor,
+            onTap: () => showNewHabitDialog(context: context),
+          ),
         ),
       ],
     );
