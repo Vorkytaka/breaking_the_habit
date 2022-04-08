@@ -6,6 +6,7 @@ import 'package:breaking_the_habit/firebase_holder.dart';
 import 'package:breaking_the_habit/ui/home/home_screen.dart';
 import 'package:breaking_the_habit/ui/login/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class App extends StatelessWidget {
@@ -22,6 +23,18 @@ class App extends StatelessWidget {
       holder: firebaseHolder,
       builder: (context) => MaterialApp(
         title: 'Flutter Demo',
+        theme: ThemeData(
+          brightness: Brightness.light,
+          appBarTheme: AppBarTheme(
+            elevation: 0,
+            actionsIconTheme: IconThemeData.fallback(),
+            backgroundColor: Colors.transparent,
+            systemOverlayStyle: SystemUiOverlayStyle.light,
+            titleTextStyle: Typography.material2018().black.merge(Typography.englishLike2018).headline6,
+            toolbarTextStyle: Typography.material2018().black.merge(Typography.englishLike2018).bodyText2,
+            iconTheme: IconThemeData.fallback(),
+          ),
+        ),
         home: context.watch<AuthBloc>().state.status == AuthStateStatus.auth ? const HomeScreen() : const LoginScreen(),
       ),
     );
