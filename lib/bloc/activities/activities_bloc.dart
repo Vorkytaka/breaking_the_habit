@@ -6,35 +6,43 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ActivitiesBloc extends Cubit<ActivitiesState> {
   final Repository repository;
-  StreamSubscription? prevMonthSubscription;
-  StreamSubscription? currentMonthSubscription;
-  StreamSubscription? nextMonthSubscription;
+  final Map<DateTime, StreamSubscription> _subs = {};
 
   ActivitiesBloc({
     required this.repository,
   }) : super(ActivitiesState());
 
-  // todo: make it great again
   void setCurrentMonth(DateTime datetime) {
-    final currentMonth = DateTime(datetime.year, datetime.month);
-    final prevMonth = currentMonth.subtract(const Duration(days: 1));
-    final nextMonth = currentMonth.add(const Duration(days: 32));
+    final newMonthSet = {
+      DateTime(datetime.year, datetime.month - 1),
+      DateTime(datetime.year, datetime.month),
+      DateTime(datetime.year, datetime.month + 1),
+    };
 
-    prevMonthSubscription?.cancel();
-    currentMonthSubscription?.cancel();
-    nextMonthSubscription?.cancel();
+    for (final month in newMonthSet) {
+      if (!_subs.containsKey(month)) {
+        _subs[month] = repository.streamAllActivitiesPerMonth(month).listen((activity) {
+          emit(state.setActivities(month, activity));
+        });
+      }
+    }
 
-    currentMonthSubscription = repository.streamAllActivitiesPerMonth(currentMonth).listen((event) {
-      emit(state.setActivities(currentMonth, event));
+    _subs.removeWhere((key, value) {
+      final shouldCancel = !newMonthSet.contains(key);
+      if (shouldCancel) {
+        print('$key cancel');
+        value.cancel();
+      }
+      return shouldCancel;
     });
+  }
 
-    nextMonthSubscription = repository.streamAllActivitiesPerMonth(nextMonth).listen((event) {
-      emit(state.setActivities(nextMonth, event));
-    });
-
-    prevMonthSubscription = repository.streamAllActivitiesPerMonth(prevMonth).listen((event) {
-      emit(state.setActivities(prevMonth, event));
-    });
+  @override
+  Future<void> close() async {
+    for (final sub in _subs.values) {
+      await sub.cancel();
+    }
+    await super.close();
   }
 }
 
