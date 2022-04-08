@@ -1,8 +1,5 @@
-import 'package:breaking_the_habit/bloc/activities/activities_bloc.dart';
 import 'package:breaking_the_habit/bloc/habit/habit_list_bloc.dart';
-import 'package:breaking_the_habit/data/repository.dart';
 import 'package:breaking_the_habit/model/habit.dart';
-import 'package:breaking_the_habit/model/id_model.dart';
 import 'package:breaking_the_habit/ui/calendar.dart';
 import 'package:breaking_the_habit/ui/habit/habit_screen.dart';
 import 'package:breaking_the_habit/ui/home/new_habit_dialog.dart';
@@ -10,19 +7,32 @@ import 'package:breaking_the_habit/utils/colors.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:table_calendar/table_calendar.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({
     Key? key,
   }) : super(key: key);
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late DateTime month;
+
+  @override
+  void initState() {
+    super.initState();
+    final today = DateTime.now();
+    month = DateTime(today.year, today.month);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text('Breaking the Habit'),
+        title: Text(MaterialLocalizations.of(context).formatMonthYear(month)),
       ),
       body: Stack(
         children: [
@@ -32,25 +42,12 @@ class HomeScreen extends StatelessWidget {
             children: [
               Expanded(
                 flex: 4,
-                child: TableCalendar(
-                  lastDay: DateTime.now(),
-                  firstDay: DateTime(1994),
-                  focusedDay: DateTime.now(),
-                  onPageChanged: (a) {
-                    context.read<ActivitiesBloc>().setCurrentMonth(a);
+                child: Calendar(
+                  onMonthChanged: (month) {
+                    this.month = month;
+                    setState(() {});
                   },
-                  onDaySelected: (selectedDay, _) async {
-                    final List<dynamic>? data = await showDialog(
-                      context: context,
-                      builder: (context) => _SelectActivity(selectedDate: selectedDay),
-                    );
-
-                    if (data != null) {
-                      final IDModel<Habit> habit = data[0];
-                      final DateTime? time = data[1];
-                      context.read<Repository>().addActivity(habit, selectedDay, time);
-                    }
-                  },
+                  onDayTap: (day) {},
                 ),
               ),
               const Spacer(flex: 3),
