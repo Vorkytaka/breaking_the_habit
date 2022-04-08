@@ -67,20 +67,31 @@ class OutDependencies extends StatelessWidget {
         lazy: false,
         child: MultiBlocProvider(
           providers: [
-            BlocProvider(
-              create: (context) => HabitListBloc(repository: context.read()),
-              lazy: false,
-            ),
             BlocProvider<AuthBloc>(
               create: (context) => AuthBloc(holder: holder),
               lazy: false,
             ),
-            BlocProvider<ActivitiesBloc>(
-              create: (context) => ActivitiesBloc(repository: context.read())..setCurrentMonth(DateTime.now()),
-              lazy: false,
-            ),
           ],
-          child: builder != null ? Builder(builder: builder!) : child!,
+          child: BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, state) => state.status == AuthStateStatus.auth
+                ? MultiBlocProvider(
+                    providers: [
+                      BlocProvider<ActivitiesBloc>(
+                        create: (context) =>
+                            ActivitiesBloc(repository: context.read())..setCurrentMonth(DateTime.now()),
+                        lazy: false,
+                      ),
+                      BlocProvider(
+                        create: (context) => HabitListBloc(repository: context.read()),
+                        lazy: false,
+                      ),
+                    ],
+                    child: builder != null ? Builder(builder: builder!) : child!,
+                  )
+                : builder != null
+                    ? Builder(builder: builder!)
+                    : child!,
+          ),
         ),
       ),
     );
