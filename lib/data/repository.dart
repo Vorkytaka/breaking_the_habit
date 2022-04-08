@@ -62,7 +62,10 @@ class RepositoryImpl implements Repository {
           toFirestore: (habit, _) => HabitJson.toJson(habit),
         )
         .snapshots()
-        .map((event) => event.docs.map((e) => IDModel(id: e.id, value: e.data())).toList(growable: false));
+        .map((event) => event.docs
+            .map((e) => IDModel(id: e.id, value: e.data()))
+            .where((habit) => !habit.value.archive)
+            .toList(growable: false));
   }
 
   @override
@@ -95,7 +98,9 @@ class RepositoryImpl implements Repository {
       throw Exception('Not auth');
     }
 
-    await firestore.collection(user.uid).doc('habit').collection('habit').doc(id).delete();
+    await firestore.collection(user.uid).doc('habit').collection('habit').doc(id).update({
+      'archive': true,
+    });
   }
 
   @override
