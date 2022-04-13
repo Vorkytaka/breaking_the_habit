@@ -380,8 +380,12 @@ class _TimeButton extends StatelessWidget {
               ? const Icon(Icons.schedule)
               : Center(
                   child: Text(
-                    MaterialLocalizations.of(context).formatTimeOfDay(TimeOfDay.fromDateTime(time!)),
+                    MaterialLocalizations.of(context).formatTimeOfDay(
+                      TimeOfDay.fromDateTime(time!),
+                      alwaysUse24HourFormat: MediaQuery.of(context).alwaysUse24HourFormat,
+                    ).replaceAll(' ', '\n'),
                     style: Theme.of(context).textTheme.caption,
+                    textAlign: TextAlign.center,
                   ),
                 ),
         ),
