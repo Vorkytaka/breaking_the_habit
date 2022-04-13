@@ -39,7 +39,10 @@ class RepositoryImpl implements Repository {
 
     final habitRef = firestore.collection(user.uid).doc('habit').collection('habit').withConverter<Habit>(
           fromFirestore: (snapshot, _) => HabitJson.fromJson(snapshot.data()!),
-          toFirestore: (habit, _) => HabitJson.toJson(habit),
+          toFirestore: (habit, _) => {
+            ...HabitJson.toJson(habit),
+            'createdDate': DateTime.now().toUtc(),
+          },
         );
 
     await habitRef.add(habit);
@@ -61,6 +64,7 @@ class RepositoryImpl implements Repository {
           fromFirestore: (snapshot, _) => HabitJson.fromJson(snapshot.data()!),
           toFirestore: (habit, _) => HabitJson.toJson(habit),
         )
+        .orderBy('createdDate')
         .snapshots()
         .map((event) => event.docs
             .map((e) => IDModel(id: e.id, value: e.data()))

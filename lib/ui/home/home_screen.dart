@@ -139,19 +139,14 @@ class _DraggableHabitsListState extends State<_DraggableHabitsList> {
 }
 
 class _HabitsList extends StatelessWidget {
-  final ScrollController? controller;
-
-  const _HabitsList({Key? key, this.controller}) : super(key: key);
+  const _HabitsList({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ListView(
-      controller: controller,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 8,
-        vertical: 10,
-      ),
-      physics: const BouncingScrollPhysics(),
+      shrinkWrap: true,
+      padding: const EdgeInsets.all(8),
+      physics: const NeverScrollableScrollPhysics(),
       children: [
         BlocBuilder<HabitListBloc, HabitListState>(
           builder: (context, state) => ListView.separated(
