@@ -2,7 +2,6 @@ import 'package:breaking_the_habit/bloc/habit/habit_list_bloc.dart';
 import 'package:breaking_the_habit/model/habit.dart';
 import 'package:breaking_the_habit/ui/calendar.dart';
 import 'package:breaking_the_habit/ui/habit/habit_dialog.dart';
-import 'package:breaking_the_habit/ui/habit/habit_screen.dart';
 import 'package:breaking_the_habit/ui/home/new_habit_dialog.dart';
 import 'package:breaking_the_habit/utils/colors.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -21,6 +20,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late DateTime month;
   bool _expanded = false;
+  final GlobalKey<CalendarState> _calendarKey = GlobalKey();
 
   @override
   void initState() {
@@ -46,8 +46,20 @@ class _HomeScreenState extends State<HomeScreen> {
               : Align(
                   key: ValueKey(_expanded),
                   alignment: Alignment.centerLeft,
-                  child: Text(
-                    MaterialLocalizations.of(context).formatMonthYear(month),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        onPressed: () => _calendarKey.currentState?.previousPage(),
+                        icon: const Icon(Icons.keyboard_arrow_left),
+                      ),
+                      IconButton(
+                        onPressed: () => _calendarKey.currentState?.nextPage(),
+                        icon: const Icon(Icons.keyboard_arrow_right),
+                      ),
+                      Text(
+                        MaterialLocalizations.of(context).formatMonthYear(month),
+                      ),
+                    ],
                   ),
                 ),
         ),
@@ -61,6 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Expanded(
                 flex: 4,
                 child: Calendar(
+                  key: _calendarKey,
                   onMonthChanged: (month) {
                     this.month = month;
                     setState(() {});

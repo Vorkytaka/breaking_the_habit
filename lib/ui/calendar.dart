@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-class Calendar extends StatelessWidget {
+class Calendar extends StatefulWidget {
   final DateTime from;
   final DateTime to;
   final ValueChanged<DateTime>? onMonthChanged;
@@ -18,23 +18,46 @@ class Calendar extends StatelessWidget {
         super(key: key);
 
   @override
+  State<Calendar> createState() => CalendarState();
+}
+
+class CalendarState extends State<Calendar> {
+  late final int monthCount;
+  final DateTime today = DateTime.now();
+  late final PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    monthCount = DateUtils.monthDelta(widget.from, widget.to);
+    _pageController = PageController(initialPage: monthCount);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final monthCount = DateUtils.monthDelta(from, to);
-    final today = DateTime.now();
-
-    final _pageController = PageController(initialPage: monthCount);
-
     return PageView.builder(
       itemCount: monthCount,
       controller: _pageController,
-      onPageChanged: (i) => onMonthChanged?.call(DateTime(from.year, from.month + i + 1)),
+      onPageChanged: (i) => widget.onMonthChanged?.call(DateTime(widget.from.year, widget.from.month + i + 1)),
       itemBuilder: (context, i) => MonthWidget(
-        month: DateTime(from.year, from.month + i + 1),
-        onDayTap: onDayTap,
+        month: DateTime(widget.from.year, widget.from.month + i + 1),
+        onDayTap: widget.onDayTap,
         today: today,
       ),
     );
   }
+
+  Future<void> nextPage() =>
+      _pageController.nextPage(duration: const Duration(milliseconds: 150), curve: Curves.easeInOut);
+
+  Future<void> previousPage() =>
+      _pageController.previousPage(duration: const Duration(milliseconds: 150), curve: Curves.easeInOut);
 }
 
 class MonthWidget extends StatelessWidget {
