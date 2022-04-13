@@ -82,7 +82,7 @@ class _DraggableHabitsListState extends State<_DraggableHabitsList> {
         final onTop = notification.extent == notification.maxExtent;
         if (onTop != isOnTop) {
           isOnTop = onTop;
-          setState(() {});
+          // setState(() {});
         }
         return false;
       },
@@ -90,6 +90,7 @@ class _DraggableHabitsListState extends State<_DraggableHabitsList> {
         initialChildSize: 3 / 7,
         minChildSize: 3 / 7,
         maxChildSize: 1,
+        snap: true,
         builder: (context, controller) => Material(
           elevation: isOnTop ? 0 : 8,
           clipBehavior: Clip.hardEdge,
@@ -241,7 +242,7 @@ class _SelectActivityState extends State<_SelectActivity> {
               _TimeButton(
                 time: time,
                 onPressed: () async {
-                  if(time != null) {
+                  if (time != null) {
                     setState(() {
                       time = null;
                     });
