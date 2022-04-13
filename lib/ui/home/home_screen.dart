@@ -1,6 +1,7 @@
 import 'package:breaking_the_habit/bloc/habit/habit_list_bloc.dart';
 import 'package:breaking_the_habit/model/habit.dart';
 import 'package:breaking_the_habit/ui/calendar.dart';
+import 'package:breaking_the_habit/ui/habit/habit_dialog.dart';
 import 'package:breaking_the_habit/ui/habit/habit_screen.dart';
 import 'package:breaking_the_habit/ui/home/new_habit_dialog.dart';
 import 'package:breaking_the_habit/utils/colors.dart';
@@ -156,13 +157,7 @@ class _HabitsList extends StatelessWidget {
             separatorBuilder: (context, i) => const SizedBox(height: 8),
             itemBuilder: (context, i) => _HabitItem(
               habit: state.habits[i].value,
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => HabitScreen(
-                    habitId: state.habits[i].id,
-                  ),
-                ),
-              ),
+              onTap: () => showHabitDialog(context: context, habitId: state.habits[i].id),
             ),
           ),
         ),

@@ -41,7 +41,7 @@ class _NewHabitDialogState extends State<NewHabitDialog> {
     return Padding(
       padding: MediaQuery.of(context).viewInsets +
           const EdgeInsets.symmetric(
-            horizontal: 16,
+            horizontal: 8,
             vertical: 16,
           ),
       child: MediaQuery.removeViewInsets(
