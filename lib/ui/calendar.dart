@@ -1,4 +1,5 @@
 import 'package:breaking_the_habit/bloc/activities/activities_bloc.dart';
+import 'package:breaking_the_habit/bloc/habit/habit_list_bloc.dart';
 import 'package:breaking_the_habit/model/activity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -46,20 +47,23 @@ class CalendarState extends State<Calendar> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ActivitiesBloc, ActivitiesState>(
-      builder: (context, state) => PageView.builder(
-        itemCount: monthCount,
-        controller: _pageController,
-        onPageChanged: (i) => widget.onMonthChanged?.call(_forI(i)),
-        itemBuilder: (context, i) {
-          final month = _forI(i);
-          return MonthWidget(
-            month: month,
-            onDayTap: widget.onDayTap,
-            today: today,
-            activities: state.activities[month.year]?[month.month],
-          );
-        },
+    return BlocSelector<HabitListBloc, HabitListState, Map<String, Color>>(
+      selector: (state) => {for (final e in state.habits) e.id: e.value.color},
+      builder: (context, colors) => BlocBuilder<ActivitiesBloc, ActivitiesState>(
+        builder: (context, state) => PageView.builder(
+          itemCount: monthCount,
+          controller: _pageController,
+          onPageChanged: (i) => widget.onMonthChanged?.call(_forI(i)),
+          itemBuilder: (context, i) {
+            final month = _forI(i);
+            return MonthWidget(
+              month: month,
+              onDayTap: widget.onDayTap,
+              today: today,
+              activities: state.activities[month.year]?[month.month],
+            );
+          },
+        ),
       ),
     );
   }
