@@ -258,94 +258,99 @@ class _SelectActivityState extends State<_SelectActivity> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      insetPadding: EdgeInsets.zero,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
       backgroundColor: Colors.transparent,
-      child: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 40.0, vertical: 24.0),
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: ListTile(
-                  tileColor: Theme.of(context).scaffoldBackgroundColor,
-                  title: const Text('Выберите привычку'),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 8),
-              _TimeButton(
-                time: time,
-                onPressed: () async {
-                  if (time != null) {
-                    setState(() {
-                      time = null;
-                    });
-                    return;
-                  }
-
-                  final selectedTime = await showTimePicker(
-                    context: context,
-                    initialTime: time != null ? TimeOfDay.fromDateTime(time!) : const TimeOfDay(hour: 12, minute: 00),
-                  );
-
-                  if (selectedTime != null) {
-                    setState(() {
-                      time = widget.selectedDate.add(Duration(
-                        hours: selectedTime.hour,
-                        minutes: selectedTime.minute,
-                      ));
-                    });
-                  }
-                },
-              ),
-            ],
-          ),
-          BlocBuilder<HabitListBloc, HabitListState>(
-            builder: (context, state) {
-              return SizedBox(
-                width: double.maxFinite,
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  physics: const ScrollPhysics(),
-                  padding: const EdgeInsets.only(
-                    top: 20,
-                    bottom: 24,
-                    left: 8,
-                    right: 8,
-                  ),
-                  itemCount: state.habits.length,
-                  separatorBuilder: (context, i) => const SizedBox(height: 8),
-                  itemBuilder: (context, i) => Material(
-                    borderRadius: const BorderRadius.all(Radius.circular(5)),
-                    elevation: 2,
-                    child: ListTile(
-                      onTap: () => Navigator.of(context).pop([state.habits[i], time]),
-                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
-                      tileColor: state.habits[i].value.color.lighten(70),
-                      leading: Container(
-                        width: 24,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: state.habits[i].value.color,
-                        ),
-                      ),
-                      title: Text(
-                        state.habits[i].value.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.65,
+        ),
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: ListTile(
+                    tileColor: Theme.of(context).scaffoldBackgroundColor,
+                    title: const Text('Выберите привычку'),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
                     ),
                   ),
                 ),
-              );
-            },
-          ),
-        ],
+                const SizedBox(width: 8),
+                _TimeButton(
+                  time: time,
+                  onPressed: () async {
+                    if (time != null) {
+                      setState(() {
+                        time = null;
+                      });
+                      return;
+                    }
+
+                    final selectedTime = await showTimePicker(
+                      context: context,
+                      initialTime: time != null ? TimeOfDay.fromDateTime(time!) : const TimeOfDay(hour: 12, minute: 00),
+                    );
+
+                    if (selectedTime != null) {
+                      setState(() {
+                        time = widget.selectedDate.add(Duration(
+                          hours: selectedTime.hour,
+                          minutes: selectedTime.minute,
+                        ));
+                      });
+                    }
+                  },
+                ),
+              ],
+            ),
+            BlocBuilder<HabitListBloc, HabitListState>(
+              builder: (context, state) {
+                return SizedBox(
+                  width: double.maxFinite,
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    physics: const ScrollPhysics(),
+                    padding: const EdgeInsets.only(
+                      top: 20,
+                      bottom: 24,
+                      left: 8,
+                      right: 8,
+                    ),
+                    itemCount: state.habits.length,
+                    separatorBuilder: (context, i) => const SizedBox(height: 8),
+                    itemBuilder: (context, i) => Material(
+                      borderRadius: const BorderRadius.all(Radius.circular(5)),
+                      elevation: 2,
+                      child: ListTile(
+                        onTap: () => Navigator.of(context).pop([state.habits[i], time]),
+                        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
+                        tileColor: state.habits[i].value.color.lighten(70),
+                        leading: Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: state.habits[i].value.color,
+                          ),
+                        ),
+                        title: Text(
+                          state.habits[i].value.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
