@@ -1,5 +1,8 @@
+import 'package:breaking_the_habit/bloc/activities/activities_bloc.dart';
+import 'package:breaking_the_habit/model/activity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class Calendar extends StatefulWidget {
   final DateTime from;
@@ -39,16 +42,24 @@ class CalendarState extends State<Calendar> {
     super.dispose();
   }
 
+  DateTime _forI(int i) => DateTime(widget.from.year, widget.from.month + i + 1);
+
   @override
   Widget build(BuildContext context) {
-    return PageView.builder(
-      itemCount: monthCount,
-      controller: _pageController,
-      onPageChanged: (i) => widget.onMonthChanged?.call(DateTime(widget.from.year, widget.from.month + i + 1)),
-      itemBuilder: (context, i) => MonthWidget(
-        month: DateTime(widget.from.year, widget.from.month + i + 1),
-        onDayTap: widget.onDayTap,
-        today: today,
+    return BlocBuilder<ActivitiesBloc, ActivitiesState>(
+      builder: (context, state) => PageView.builder(
+        itemCount: monthCount,
+        controller: _pageController,
+        onPageChanged: (i) => widget.onMonthChanged?.call(_forI(i)),
+        itemBuilder: (context, i) {
+          final month = _forI(i);
+          return MonthWidget(
+            month: month,
+            onDayTap: widget.onDayTap,
+            today: today,
+            activities: state.activities[month.year]?[month.month],
+          );
+        },
       ),
     );
   }
@@ -64,12 +75,14 @@ class MonthWidget extends StatelessWidget {
   final DateTime month;
   final DateTime today;
   final ValueChanged<DateTime>? onDayTap;
+  final Map<int, List<Activity>>? activities;
 
   const MonthWidget({
     Key? key,
     required this.month,
     required this.today,
     this.onDayTap,
+    this.activities,
   }) : super(key: key);
 
   List<Widget> _dayHeaders(TextStyle? headerStyle, MaterialLocalizations localizations) {
@@ -125,9 +138,14 @@ class MonthWidget extends StatelessWidget {
       );
 
       if (!isDisabled) {
-        dayWidget = InkResponse(
-          onTap: onDayTap != null ? () => onDayTap!.call(dayToBuild) : null,
-          child: dayWidget,
+        dayWidget = Stack(
+          children: [
+            InkResponse(
+              onTap: onDayTap != null ? () => onDayTap!.call(dayToBuild) : null,
+              child: dayWidget,
+            ),
+            if (activities?[dayToBuild.day] != null) Text('${activities?[dayToBuild.day]?.length}')
+          ],
         );
       }
 
