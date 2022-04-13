@@ -1,4 +1,5 @@
 import 'package:breaking_the_habit/bloc/habit/habit_list_bloc.dart';
+import 'package:breaking_the_habit/data/repository.dart';
 import 'package:breaking_the_habit/model/habit.dart';
 import 'package:breaking_the_habit/ui/calendar.dart';
 import 'package:breaking_the_habit/ui/habit/habit_dialog.dart';
@@ -327,7 +328,14 @@ class _SelectActivityState extends State<_SelectActivity> {
                       borderRadius: const BorderRadius.all(Radius.circular(5)),
                       elevation: 2,
                       child: ListTile(
-                        onTap: () => Navigator.of(context).pop([state.habits[i], time]),
+                        onTap: () {
+                          context.read<Repository>().addActivity(
+                                state.habits[i],
+                                widget.selectedDate,
+                                time,
+                              );
+                          Navigator.of(context).pop([state.habits[i], time]);
+                        },
                         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
                         tileColor: state.habits[i].value.color.lighten(70),
                         leading: Container(
@@ -380,10 +388,12 @@ class _TimeButton extends StatelessWidget {
               ? const Icon(Icons.schedule)
               : Center(
                   child: Text(
-                    MaterialLocalizations.of(context).formatTimeOfDay(
-                      TimeOfDay.fromDateTime(time!),
-                      alwaysUse24HourFormat: MediaQuery.of(context).alwaysUse24HourFormat,
-                    ).replaceAll(' ', '\n'),
+                    MaterialLocalizations.of(context)
+                        .formatTimeOfDay(
+                          TimeOfDay.fromDateTime(time!),
+                          alwaysUse24HourFormat: MediaQuery.of(context).alwaysUse24HourFormat,
+                        )
+                        .replaceAll(' ', '\n'),
                     style: Theme.of(context).textTheme.caption,
                     textAlign: TextAlign.center,
                   ),
