@@ -67,16 +67,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _DraggableHabitsList extends StatefulWidget {
-  @override
-  State<_DraggableHabitsList> createState() => _DraggableHabitsListState();
-}
-
-class _DraggableHabitsListState extends State<_DraggableHabitsList> {
-  bool isOnTop = false;
-
+class _DraggableHabitsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    bool isOnTop = false;
     return NotificationListener<DraggableScrollableNotification>(
       onNotification: (notification) {
         final onTop = notification.extent >= 0.9;
