@@ -79,7 +79,7 @@ class _DraggableHabitsListState extends State<_DraggableHabitsList> {
   Widget build(BuildContext context) {
     return NotificationListener<DraggableScrollableNotification>(
       onNotification: (notification) {
-        final onTop = notification.extent == notification.maxExtent;
+        final onTop = notification.extent >= 0.9;
         if (onTop != isOnTop) {
           isOnTop = onTop;
           // setState(() {});
@@ -91,11 +91,18 @@ class _DraggableHabitsListState extends State<_DraggableHabitsList> {
         minChildSize: 3 / 7,
         maxChildSize: 1,
         snap: true,
-        builder: (context, controller) => Material(
-          elevation: isOnTop ? 0 : 8,
-          clipBehavior: Clip.hardEdge,
-          child: _HabitsList(
+        // todo: check performance
+        builder: (context, controller) => LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
             controller: controller,
+            child: SizedBox(
+              height: constraints.maxHeight,
+              child: Material(
+                elevation: isOnTop ? 0 : 8,
+                clipBehavior: Clip.hardEdge,
+                child: const _HabitsList(),
+              ),
+            ),
           ),
         ),
       ),
