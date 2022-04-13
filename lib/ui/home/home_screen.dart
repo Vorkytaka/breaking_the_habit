@@ -19,6 +19,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late DateTime month;
+  bool _expanded = false;
 
   @override
   void initState() {
@@ -32,7 +33,23 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text(MaterialLocalizations.of(context).formatMonthYear(month)),
+        centerTitle: false,
+        title: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 150),
+          child: _expanded
+              ? Align(
+                  key: ValueKey(_expanded),
+                  alignment: Alignment.centerLeft,
+                  child: const Text('Breaking the Habits'),
+                )
+              : Align(
+                  key: ValueKey(_expanded),
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    MaterialLocalizations.of(context).formatMonthYear(month),
+                  ),
+                ),
+        ),
       ),
       body: Stack(
         children: [
@@ -60,22 +77,39 @@ class _HomeScreenState extends State<HomeScreen> {
               const Spacer(flex: 3),
             ],
           ),
-          _DraggableHabitsList(),
+          _DraggableHabitsList(
+            onExpanded: (expanded) {
+              setState(() {
+                _expanded = expanded;
+              });
+            },
+          ),
         ],
       ),
     );
   }
 }
 
-class _DraggableHabitsList extends StatelessWidget {
+class _DraggableHabitsList extends StatefulWidget {
+  final ValueChanged<bool>? onExpanded;
+
+  const _DraggableHabitsList({Key? key, this.onExpanded}) : super(key: key);
+
+  @override
+  State<_DraggableHabitsList> createState() => _DraggableHabitsListState();
+}
+
+class _DraggableHabitsListState extends State<_DraggableHabitsList> {
+  bool isOnTop = false;
+
   @override
   Widget build(BuildContext context) {
-    bool isOnTop = false;
     return NotificationListener<DraggableScrollableNotification>(
       onNotification: (notification) {
         final onTop = notification.extent >= 0.9;
         if (onTop != isOnTop) {
           isOnTop = onTop;
+          widget.onExpanded?.call(isOnTop);
           // setState(() {});
         }
         return false;
@@ -84,7 +118,7 @@ class _DraggableHabitsList extends StatelessWidget {
         initialChildSize: 3 / 7,
         minChildSize: 3 / 7,
         maxChildSize: 1,
-        snap: true,
+        // snap: true,
         // todo: check performance
         builder: (context, controller) => LayoutBuilder(
           builder: (context, constraints) => SingleChildScrollView(
