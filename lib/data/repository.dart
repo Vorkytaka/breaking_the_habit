@@ -118,20 +118,34 @@ class RepositoryImpl implements Repository {
     final docRef =
         firestore.collection(user.uid).doc('${datetime.year}').collection('${datetime.year}').doc('${datetime.month}');
 
-    await docRef.get().then((snapshot) async {
-      if (!snapshot.exists) {
-        await docRef.set({});
-      }
-    });
+    await firestore.runTransaction(
+      (transaction) async {
+        final doc = await transaction.get(docRef);
 
-    await docRef.update(
-      {
-        '${datetime.day}': FieldValue.arrayUnion([
-          {
-            'habit_id': habit.id,
-            'timestamp': time?.toUtc().millisecondsSinceEpoch,
-          }
-        ]),
+        final habitData = {
+          'habit_id': habit.id,
+          'timestamp': time?.toUtc().millisecondsSinceEpoch,
+        };
+
+        if (doc.exists) {
+          final data = doc.data();
+          final dayActivity = data?['${datetime.day}'];
+          final List newDayActivity = [
+            if (dayActivity != null) ...dayActivity,
+            habitData,
+          ];
+          transaction.set(
+            docRef,
+            {'${datetime.day}': newDayActivity},
+            SetOptions(merge: true),
+          );
+        } else {
+          transaction.set(docRef, {
+            '${datetime.day}': [
+              habitData,
+            ],
+          });
+        }
       },
     );
   }
