@@ -61,6 +61,7 @@ class CalendarState extends State<Calendar> {
               onDayTap: widget.onDayTap,
               today: today,
               activities: state.activities[month.year]?[month.month],
+              colors: colors,
             );
           },
         ),
@@ -80,6 +81,7 @@ class MonthWidget extends StatelessWidget {
   final DateTime today;
   final ValueChanged<DateTime>? onDayTap;
   final Map<int, List<Activity>>? activities;
+  final Map<String, Color> colors;
 
   const MonthWidget({
     Key? key,
@@ -87,6 +89,7 @@ class MonthWidget extends StatelessWidget {
     required this.today,
     this.onDayTap,
     this.activities,
+    required this.colors,
   }) : super(key: key);
 
   List<Widget> _dayHeaders(TextStyle? headerStyle, MaterialLocalizations localizations) {
@@ -124,6 +127,16 @@ class MonthWidget extends StatelessWidget {
     while (day < daysOnPage) {
       day++;
       final DateTime dayToBuild = DateTime(year, month, day);
+      final List<Activity> activities = this.activities?[dayToBuild.day] ?? const [];
+      final Map<String, int> activitiesCount = {};
+      for (int i = 0; i < activities.length; i++) {
+        final id = activities[i].habitId;
+        if (activitiesCount.containsKey(id)) {
+          activitiesCount[id] = activitiesCount[id]! + 1;
+        } else {
+          activitiesCount[id] = 1;
+        }
+      }
 
       final bool isDisabled = day < 1 || day > daysInMonth || today.isBefore(dayToBuild);
 
@@ -144,11 +157,27 @@ class MonthWidget extends StatelessWidget {
       if (!isDisabled) {
         dayWidget = Stack(
           children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (final key in activitiesCount.keys)
+                  Container(
+                    decoration: BoxDecoration(
+                      color: colors[key]!,
+                      shape: BoxShape.circle,
+                    ),
+                    padding: const EdgeInsets.all(4),
+                    child: Text(
+                      '${activitiesCount[key]}',
+                      style: theme.textTheme.caption?.apply(color: Colors.white),
+                    ),
+                  )
+              ],
+            ),
             InkResponse(
               onTap: onDayTap != null ? () => onDayTap!.call(dayToBuild) : null,
               child: dayWidget,
             ),
-            if (activities?[dayToBuild.day] != null) Text('${activities?[dayToBuild.day]?.length}')
           ],
         );
       }
