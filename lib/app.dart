@@ -4,7 +4,7 @@ import 'package:breaking_the_habit/bloc/habit/habit_list_bloc.dart';
 import 'package:breaking_the_habit/data/repository.dart';
 import 'package:breaking_the_habit/firebase_holder.dart';
 import 'package:breaking_the_habit/ui/home/home_screen.dart';
-import 'package:breaking_the_habit/ui/login/login_screen.dart';
+import 'package:breaking_the_habit/ui/login/start_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -36,7 +36,7 @@ class App extends StatelessWidget {
           ),
         ),
         builder: (context, child) => InnerDependecies(child: child!),
-        home: context.watch<AuthBloc>().state.status == AuthStateStatus.auth ? const HomeScreen() : const LoginScreen(),
+        home: context.watch<AuthBloc>().state.status == AuthStateStatus.auth ? const HomeScreen() : const StartScreen(),
       ),
     );
   }

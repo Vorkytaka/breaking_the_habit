@@ -10,6 +10,7 @@ import 'package:breaking_the_habit/utils/colors.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -38,6 +39,9 @@ class _HomeScreenState extends State<HomeScreen> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         centerTitle: false,
+        leading: SvgPicture.asset(
+          'assets/svg/icon.svg',
+        ),
         title: AnimatedSwitcher(
           duration: const Duration(milliseconds: 150),
           child: _expanded
@@ -49,23 +53,29 @@ class _HomeScreenState extends State<HomeScreen> {
               : Align(
                   key: ValueKey(_expanded),
                   alignment: Alignment.centerLeft,
-                  child: Row(
-                    children: [
-                      IconButton(
-                        onPressed: () => _calendarKey.currentState?.previousPage(),
-                        icon: const Icon(Icons.keyboard_arrow_left),
-                      ),
-                      IconButton(
-                        onPressed: () => _calendarKey.currentState?.nextPage(),
-                        icon: const Icon(Icons.keyboard_arrow_right),
-                      ),
-                      Text(
-                        MaterialLocalizations.of(context).formatMonthYear(month),
-                      ),
-                    ],
+                  child: Text(
+                    MaterialLocalizations.of(context).formatMonthYear(month),
                   ),
                 ),
         ),
+        actions: [
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 150),
+            child: _expanded ? const SizedBox() : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  onPressed: () => _calendarKey.currentState?.previousPage(),
+                  icon: const Icon(Icons.keyboard_arrow_left),
+                ),
+                IconButton(
+                  onPressed: () => _calendarKey.currentState?.nextPage(),
+                  icon: const Icon(Icons.keyboard_arrow_right),
+                ),
+              ],
+            ),
+          )
+        ],
       ),
       body: Stack(
         children: [
