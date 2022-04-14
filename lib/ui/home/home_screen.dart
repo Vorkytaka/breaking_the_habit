@@ -1,3 +1,4 @@
+import 'package:breaking_the_habit/bloc/activities/activities_bloc.dart';
 import 'package:breaking_the_habit/bloc/habit/habit_list_bloc.dart';
 import 'package:breaking_the_habit/data/repository.dart';
 import 'package:breaking_the_habit/model/habit.dart';
@@ -78,6 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   onMonthChanged: (month) {
                     this.month = month;
                     setState(() {});
+                    context.read<ActivitiesBloc>().setCurrentMonth(month);
                   },
                   onDayTap: (day) {
                     showDialog(
