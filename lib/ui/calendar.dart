@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:breaking_the_habit/bloc/activities/activities_bloc.dart';
 import 'package:breaking_the_habit/bloc/habit/habit_list_bloc.dart';
 import 'package:breaking_the_habit/model/activity.dart';
@@ -75,6 +77,9 @@ class CalendarState extends State<Calendar> {
   Future<void> previousPage() =>
       _pageController.previousPage(duration: const Duration(milliseconds: 150), curve: Curves.easeInOut);
 }
+
+double radians(double angle) => (angle * pi) / 180;
+const double angleStep = 360 / 7;
 
 class MonthWidget extends StatelessWidget {
   final DateTime month;
@@ -154,26 +159,18 @@ class MonthWidget extends StatelessWidget {
         ),
       );
 
+      final keys = activitiesCount.keys.toList(growable: false);
       if (!isDisabled) {
         dayWidget = Stack(
+          alignment: Alignment.center,
           children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (final key in activitiesCount.keys)
-                  Container(
-                    decoration: BoxDecoration(
-                      color: colors[key]!,
-                      shape: BoxShape.circle,
-                    ),
-                    padding: const EdgeInsets.all(4),
-                    child: Text(
-                      '${activitiesCount[key]}',
-                      style: theme.textTheme.caption?.apply(color: Colors.white),
-                    ),
-                  )
-              ],
-            ),
+            for (int i = 0; i < keys.length; i++)
+              _ActivityItem(
+                color: colors[keys[i]]!,
+                count: activitiesCount[keys[i]]!,
+                textStyle: theme.textTheme.caption?.apply(color: Colors.white),
+                i: i,
+              ),
             InkResponse(
               onTap: onDayTap != null ? () => onDayTap!.call(dayToBuild) : null,
               child: dayWidget,
@@ -191,6 +188,45 @@ class MonthWidget extends StatelessWidget {
       childrenDelegate: SliverChildListDelegate(
         days,
         addRepaintBoundaries: false,
+      ),
+    );
+  }
+}
+
+class _ActivityItem extends StatelessWidget {
+  final Color color;
+  final int count;
+  final TextStyle? textStyle;
+  final int i;
+
+  const _ActivityItem({
+    Key? key,
+    required this.color,
+    required this.count,
+    this.textStyle,
+    required this.i,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final angle = i * angleStep - 90;
+    final radian = radians(angle);
+    return Transform(
+      transform: Matrix4.identity()
+        ..translate(
+          20 * cos(radian),
+          20 * sin(radian),
+        ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+        ),
+        padding: const EdgeInsets.all(4),
+        child: Text(
+          '$count',
+          style: textStyle,
+        ),
       ),
     );
   }
