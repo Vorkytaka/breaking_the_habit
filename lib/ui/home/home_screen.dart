@@ -2,6 +2,7 @@ import 'package:breaking_the_habit/bloc/activities/activities_bloc.dart';
 import 'package:breaking_the_habit/bloc/habit/habit_list_bloc.dart';
 import 'package:breaking_the_habit/data/repository.dart';
 import 'package:breaking_the_habit/model/habit.dart';
+import 'package:breaking_the_habit/model/id_model.dart';
 import 'package:breaking_the_habit/ui/calendar.dart';
 import 'package:breaking_the_habit/ui/habit/habit_dialog.dart';
 import 'package:breaking_the_habit/ui/home/new_habit_dialog.dart';
@@ -172,7 +173,7 @@ class _HabitsList extends StatelessWidget {
             itemCount: state.habits.length,
             separatorBuilder: (context, i) => const SizedBox(height: 8),
             itemBuilder: (context, i) => _HabitItem(
-              habit: state.habits[i].value,
+              habit: state.habits[i],
               onTap: () => showHabitDialog(context: context, habitId: state.habits[i].id),
             ),
           ),
@@ -199,7 +200,7 @@ class _HabitsList extends StatelessWidget {
 }
 
 class _HabitItem extends StatelessWidget {
-  final Habit habit;
+  final IDModel<Habit> habit;
   final VoidCallback? onTap;
 
   const _HabitItem({
@@ -215,21 +216,21 @@ class _HabitItem extends StatelessWidget {
       elevation: 2,
       child: ListTile(
         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
-        tileColor: habit.color.lighten(70),
+        tileColor: habit.value.color.lighten(70),
         leading: Container(
           width: 24,
           height: 24,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: habit.color,
+            color: habit.value.color,
           ),
         ),
         title: Text(
-          habit.title,
+          habit.value.title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        trailing: const Text('10 раз в день'),
+        trailing: Text(context.watch<ActivitiesBloc>().countHabitStats(habit.id).toString()),
         onTap: onTap,
       ),
     );

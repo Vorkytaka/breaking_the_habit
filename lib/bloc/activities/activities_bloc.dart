@@ -7,13 +7,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class ActivitiesBloc extends Cubit<ActivitiesState> {
   final Repository repository;
   final Map<DateTime, StreamSubscription> _subs = {};
+  final DateTime today = DateTime.now();
+  late final DateTime lastStatDate;
 
   ActivitiesBloc({
     required this.repository,
-  }) : super(ActivitiesState());
+  }) : super(ActivitiesState()) {
+    lastStatDate = DateTime(today.year, today.month - 3, today.day);
+  }
 
   void setCurrentMonth(DateTime datetime) {
     final newMonthSet = {
+      DateTime(datetime.year, datetime.month - 3),
+      DateTime(datetime.year, datetime.month - 2),
       DateTime(datetime.year, datetime.month - 1),
       DateTime(datetime.year, datetime.month),
       DateTime(datetime.year, datetime.month + 1),
@@ -30,7 +36,6 @@ class ActivitiesBloc extends Cubit<ActivitiesState> {
     _subs.removeWhere((key, value) {
       final shouldCancel = !newMonthSet.contains(key);
       if (shouldCancel) {
-        print('$key cancel');
         value.cancel();
       }
       return shouldCancel;
@@ -43,6 +48,29 @@ class ActivitiesBloc extends Cubit<ActivitiesState> {
       await sub.cancel();
     }
     await super.close();
+  }
+
+  double countHabitStats(String habitId) {
+    int count = 0;
+    for (final year in state.activities.keys) {
+      final yearValues = state.activities[year];
+      if (yearValues == null) continue;
+      for (final month in yearValues.keys) {
+        final monthValues = yearValues[month];
+        if (monthValues == null) continue;
+        for (final day in monthValues.keys) {
+          if (lastStatDate.isAfter(DateTime(year, month, day))) continue;
+          final activities = monthValues[day];
+          if (activities == null) continue;
+          for (final activity in activities) {
+            if (activity.habitId == habitId) {
+              count += 1;
+            }
+          }
+        }
+      }
+    }
+    return count / 90;
   }
 }
 
