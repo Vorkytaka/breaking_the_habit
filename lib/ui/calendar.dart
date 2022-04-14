@@ -223,10 +223,15 @@ class _ActivityItem extends StatelessWidget {
           shape: BoxShape.circle,
         ),
         padding: const EdgeInsets.all(4),
-        child: Text(
-          '$count',
-          style: textStyle,
-        ),
+        child: count == 1
+            ? const SizedBox(
+                height: 7,
+                width: 7,
+              )
+            : Text(
+                '$count',
+                style: textStyle,
+              ),
       ),
     );
   }
