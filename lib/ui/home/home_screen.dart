@@ -211,6 +211,7 @@ class _HabitItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final stats = context.watch<ActivitiesBloc>().countHabitStats(habit.id);
     return Material(
       borderRadius: const BorderRadius.all(Radius.circular(5)),
       elevation: 2,
@@ -230,7 +231,10 @@ class _HabitItem extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        trailing: Text(context.watch<ActivitiesBloc>().countHabitStats(habit.id).toString()),
+        trailing: Text(
+          '${stats.toStringAsFixed(2)} в среднем',
+          style: Theme.of(context).textTheme.caption,
+        ),
         onTap: onTap,
       ),
     );
