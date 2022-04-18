@@ -1,5 +1,14 @@
 {
   "app_name": "Breaking the Habit",
+  "common_yes": "Yes",
+  "common_no": "No",
   "start_screen__title": "Breaking\nthe Habit",
-  "start_screen__start_button": "START"
+  "start_screen__start_button": "START",
+  "home_screen__add_habit": "Add a habit",
+  "home_screen__avg": "{count} avg",
+  "add_habit__habit_hint": "Habit name",
+  "add_habit__required": "Field required",
+  "habit_delete__title": "Delete habit",
+  "habit_delete__text": "Do you really want to delete {habit}?",
+  "select_activity__title": "Select the habit"
 }

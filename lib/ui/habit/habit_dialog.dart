@@ -1,6 +1,7 @@
 import 'package:breaking_the_habit/bloc/habit/habit_list_bloc.dart';
 import 'package:breaking_the_habit/color_dialog.dart';
 import 'package:breaking_the_habit/data/repository.dart';
+import 'package:breaking_the_habit/generated/l10n.dart';
 import 'package:breaking_the_habit/model/habit.dart';
 import 'package:breaking_the_habit/model/id_model.dart';
 import 'package:breaking_the_habit/utils/collections.dart';
@@ -92,16 +93,16 @@ class HabitDialog extends StatelessWidget {
                             final bool accepted = (await showDialog(
                                   context: context,
                                   builder: (context) => AlertDialog(
-                                    title: const Text("Удаление привычки"),
-                                    content: Text("Действительно удалить привычку ${habit.value.title}?"),
+                                    title: Text(S.of(context).habit_delete__title),
+                                    content: Text(S.of(context).habit_delete__text(habit.value.title)),
                                     actions: [
                                       TextButton(
                                         onPressed: () => Navigator.of(context).pop(false),
-                                        child: const Text('Нет'),
+                                        child: Text(S.of(context).common_no),
                                       ),
                                       TextButton(
                                         onPressed: () => Navigator.of(context).pop(true),
-                                        child: const Text('Да'),
+                                        child: Text(S.of(context).common_yes),
                                         style: TextButton.styleFrom(primary: Theme.of(context).errorColor),
                                       ),
                                     ],

@@ -60,6 +60,26 @@ class S {
     );
   }
 
+  /// `Yes`
+  String get common_yes {
+    return Intl.message(
+      'Yes',
+      name: 'common_yes',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No`
+  String get common_no {
+    return Intl.message(
+      'No',
+      name: 'common_no',
+      desc: '',
+      args: [],
+    );
+  }
+
   /// `Breaking\nthe Habit`
   String get start_screen__title {
     return Intl.message(
@@ -75,6 +95,76 @@ class S {
     return Intl.message(
       'START',
       name: 'start_screen__start_button',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add a habit`
+  String get home_screen__add_habit {
+    return Intl.message(
+      'Add a habit',
+      name: 'home_screen__add_habit',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `{count} avg`
+  String home_screen__avg(Object count) {
+    return Intl.message(
+      '$count avg',
+      name: 'home_screen__avg',
+      desc: '',
+      args: [count],
+    );
+  }
+
+  /// `Habit name`
+  String get add_habit__habit_hint {
+    return Intl.message(
+      'Habit name',
+      name: 'add_habit__habit_hint',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Field required`
+  String get add_habit__required {
+    return Intl.message(
+      'Field required',
+      name: 'add_habit__required',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Delete habit`
+  String get habit_delete__title {
+    return Intl.message(
+      'Delete habit',
+      name: 'habit_delete__title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Do you really want to delete {habit}?`
+  String habit_delete__text(Object habit) {
+    return Intl.message(
+      'Do you really want to delete $habit?',
+      name: 'habit_delete__text',
+      desc: '',
+      args: [habit],
+    );
+  }
+
+  /// `Select the habit`
+  String get select_activity__title {
+    return Intl.message(
+      'Select the habit',
+      name: 'select_activity__title',
       desc: '',
       args: [],
     );

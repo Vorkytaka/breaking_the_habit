@@ -1,5 +1,6 @@
 import 'package:breaking_the_habit/color_dialog.dart';
 import 'package:breaking_the_habit/data/repository.dart';
+import 'package:breaking_the_habit/generated/l10n.dart';
 import 'package:breaking_the_habit/model/habit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -72,16 +73,16 @@ class _NewHabitDialogState extends State<NewHabitDialog> {
                   Expanded(
                     child: TextFormField(
                       controller: _titleController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         border: InputBorder.none,
-                        hintText: 'Привычка',
+                        hintText: S.of(context).add_habit__habit_hint,
                       ),
                       maxLines: 1,
                       autofocus: true,
                       textCapitalization: TextCapitalization.sentences,
                       validator: (str) {
                         if (str == null || str.isEmpty) {
-                          return 'Заполните название';
+                          return S.of(context).add_habit__required;
                         }
 
                         return null;

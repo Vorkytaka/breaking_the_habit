@@ -1,6 +1,7 @@
 import 'package:breaking_the_habit/bloc/activities/activities_bloc.dart';
 import 'package:breaking_the_habit/bloc/habit/habit_list_bloc.dart';
 import 'package:breaking_the_habit/data/repository.dart';
+import 'package:breaking_the_habit/generated/l10n.dart';
 import 'package:breaking_the_habit/model/habit.dart';
 import 'package:breaking_the_habit/model/id_model.dart';
 import 'package:breaking_the_habit/ui/calendar.dart';
@@ -48,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ? Align(
                   key: ValueKey(_expanded),
                   alignment: Alignment.centerLeft,
-                  child: const Text('Breaking the Habits'),
+                  child: Text(S.of(context).app_name),
                 )
               : Align(
                   key: ValueKey(_expanded),
@@ -198,7 +199,7 @@ class _HabitsList extends StatelessWidget {
           child: ListTile(
             shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
             leading: const Icon(Icons.add),
-            title: const Text('Добавить привычку'),
+            title: Text(S.of(context).home_screen__add_habit),
             textColor: Theme.of(context).disabledColor,
             iconColor: Theme.of(context).disabledColor,
             onTap: () => showNewHabitDialog(context: context),
@@ -242,7 +243,7 @@ class _HabitItem extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
         ),
         trailing: Text(
-          '${stats.toStringAsFixed(2)} в среднем',
+          S.of(context).home_screen__avg(stats.toStringAsFixed(2)),
           style: Theme.of(context).textTheme.caption,
         ),
         onTap: onTap,
@@ -292,7 +293,7 @@ class _SelectActivityState extends State<_SelectActivity> {
                 Expanded(
                   child: ListTile(
                     tileColor: Theme.of(context).scaffoldBackgroundColor,
-                    title: const Text('Выберите привычку'),
+                    title: Text(S.of(context).select_activity__title),
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(Radius.circular(5)),
                     ),

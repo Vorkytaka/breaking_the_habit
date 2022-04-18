@@ -1,3 +1,12 @@
 {
-  "start_screen__start_button": "НАЧАТЬ"
+  "common_yes": "Да",
+  "common_no": "Нет",
+  "start_screen__start_button": "НАЧАТЬ",
+  "home_screen__add_habit": "Добавить привычку",
+  "home_screen__avg": "{count} в среднем",
+  "add_habit__habit_hint": "Привычка",
+  "add_habit__required": "Заполните название",
+  "habit_delete__title": "Удаление привычки",
+  "habit_delete__text": "Вы действительно хотите удалить привычку {habit}?",
+  "select_activity__title": "Выберите привычку"
 }

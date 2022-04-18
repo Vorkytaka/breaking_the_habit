@@ -20,9 +20,27 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'en';
 
+  static String m0(habit) => "Do you really want to delete ${habit}?";
+
+  static String m1(count) => "${count} avg";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static Map<String, Function> _notInlinedMessages(_) => <String, Function>{
+        "add_habit__habit_hint":
+            MessageLookupByLibrary.simpleMessage("Habit name"),
+        "add_habit__required":
+            MessageLookupByLibrary.simpleMessage("Field required"),
         "app_name": MessageLookupByLibrary.simpleMessage("Breaking the Habit"),
+        "common_no": MessageLookupByLibrary.simpleMessage("No"),
+        "common_yes": MessageLookupByLibrary.simpleMessage("Yes"),
+        "habit_delete__text": m0,
+        "habit_delete__title":
+            MessageLookupByLibrary.simpleMessage("Delete habit"),
+        "home_screen__add_habit":
+            MessageLookupByLibrary.simpleMessage("Add a habit"),
+        "home_screen__avg": m1,
+        "select_activity__title":
+            MessageLookupByLibrary.simpleMessage("Select the habit"),
         "start_screen__start_button":
             MessageLookupByLibrary.simpleMessage("START"),
         "start_screen__title":
