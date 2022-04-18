@@ -155,7 +155,7 @@ class MonthWidget extends StatelessWidget {
       Widget dayWidget = Center(
         child: Text(
           localizations.formatDecimal(dayToBuild.day),
-          style: theme.textTheme.caption?.apply(color: dayColor),
+          style: theme.textTheme.subtitle1?.apply(color: dayColor),
         ),
       );
 
@@ -214,8 +214,8 @@ class _ActivityItem extends StatelessWidget {
     return Transform(
       transform: Matrix4.identity()
         ..translate(
-          20 * cos(radian),
-          20 * sin(radian),
+          19 * cos(radian),
+          19 * sin(radian),
         ),
       child: Container(
         decoration: BoxDecoration(
