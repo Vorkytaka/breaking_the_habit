@@ -1,19 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 
 class FirebaseHolder {
   final FirebaseApp app;
   final FirebaseAuth auth;
   final FirebaseFirestore firestore;
+  final FirebaseCrashlytics crashlytics;
 
   FirebaseHolder({
     required this.app,
     FirebaseAuth? auth,
     FirebaseFirestore? firestore,
+    FirebaseCrashlytics? crashlytics,
   })  : auth = auth ?? FirebaseAuth.instanceFor(app: app),
-        firestore = firestore ?? FirebaseFirestore.instanceFor(app: app);
+        firestore = firestore ?? FirebaseFirestore.instanceFor(app: app),
+        crashlytics = crashlytics ?? FirebaseCrashlytics.instance;
 }
 
 class FirebaseHolderWidget extends InheritedWidget {
