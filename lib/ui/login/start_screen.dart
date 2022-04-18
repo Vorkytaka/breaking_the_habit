@@ -33,7 +33,7 @@ class _StartScreenState extends State<StartScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     SvgPicture.asset(
-                      'assets/svg/icon.svg',
+                      'assets/svg/icon_foreground.svg',
                       width: 112,
                     ),
                     Text(

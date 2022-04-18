@@ -32,3 +32,5 @@ flutter_icons:
   image_path: 'assets/png/icon.png'
   ios: true
   android: true
+  adaptive_icon_foreground: 'assets/png/icon_foreground.png'
+  adaptive_icon_background: '#fafafa'

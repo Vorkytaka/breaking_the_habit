@@ -40,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         centerTitle: false,
         leading: SvgPicture.asset(
-          'assets/svg/icon.svg',
+          'assets/svg/icon_foreground.svg',
         ),
         title: AnimatedSwitcher(
           duration: const Duration(milliseconds: 150),
