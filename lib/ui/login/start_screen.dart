@@ -1,4 +1,5 @@
 import 'package:breaking_the_habit/firebase_holder.dart';
+import 'package:breaking_the_habit/generated/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -37,7 +38,7 @@ class _StartScreenState extends State<StartScreen> {
                       width: 112,
                     ),
                     Text(
-                      'Breaking\nthe Habits',
+                      S.of(context).start_screen__title,
                       style: Theme.of(context).textTheme.headline3?.copyWith(fontWeight: FontWeight.w200),
                       textAlign: TextAlign.center,
                     ),
@@ -57,7 +58,7 @@ class _StartScreenState extends State<StartScreen> {
                       ),
                     ),
                     onPressed: _loading ? null : _onStartPressed,
-                    child: _loading ? const CircularProgressIndicator() : const Text('НАЧАТЬ'),
+                    child: _loading ? const CircularProgressIndicator() : Text(S.of(context).start_screen__start_button),
                   ),
                 ),
               ),

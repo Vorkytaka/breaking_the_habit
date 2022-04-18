@@ -15,7 +15,10 @@ dependencies:
   dotted_border: ^2.0.0+2
   flutter_svg: ^1.0.3
   flutter_launcher_icons: ^0.9.2
+  intl: ^0.17.0
   flutter:
+    sdk: flutter
+  flutter_localizations:
     sdk: flutter
 
 dev_dependencies:
@@ -34,3 +37,6 @@ flutter_icons:
   android: true
   adaptive_icon_foreground: 'assets/png/icon_foreground.png'
   adaptive_icon_background: '#fafafa'
+
+flutter_intl:
+  enabled: true

@@ -3,11 +3,14 @@ import 'package:breaking_the_habit/bloc/auth/auth_bloc.dart';
 import 'package:breaking_the_habit/bloc/habit/habit_list_bloc.dart';
 import 'package:breaking_the_habit/data/repository.dart';
 import 'package:breaking_the_habit/firebase_holder.dart';
+import 'package:breaking_the_habit/generated/l10n.dart';
 import 'package:breaking_the_habit/ui/home/home_screen.dart';
 import 'package:breaking_the_habit/ui/login/start_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/intl.dart';
 
 class App extends StatelessWidget {
   final FirebaseHolder firebaseHolder;
@@ -22,7 +25,14 @@ class App extends StatelessWidget {
     return OutDependencies(
       holder: firebaseHolder,
       builder: (context) => MaterialApp(
-        title: 'Flutter Demo',
+        supportedLocales: S.delegate.supportedLocales,
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          S.delegate,
+        ],
+        onGenerateTitle: (context) => S.of(context).app_name,
         theme: ThemeData(
           brightness: Brightness.light,
           appBarTheme: AppBarTheme(
