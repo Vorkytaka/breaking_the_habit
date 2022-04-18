@@ -33,7 +33,7 @@ class HabitDialog extends StatelessWidget {
     return BlocListener<HabitListBloc, HabitListState>(
       listener: (context, state) {
         final habit = state.habits.firstOrNull((element) => element.id == habitId);
-        if (habit == null) {
+        if (habit == null || habit.value.archive) {
           Navigator.of(context).pop();
         }
       },
@@ -53,7 +53,10 @@ class HabitDialog extends StatelessWidget {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             clipBehavior: Clip.hardEdge,
             child: BlocBuilder<HabitListBloc, HabitListState>(
-              buildWhen: (prev, curr) => curr.habits.firstOrNull((element) => element.id == habitId) != null,
+              buildWhen: (prev, curr) {
+                final habit = curr.habits.firstOrNull((element) => element.id == habitId);
+                return habit != null && !habit.value.archive;
+              },
               builder: (context, state) {
                 final habit = state.habits.firstWhere((element) => element.id == habitId);
                 return ListTile(

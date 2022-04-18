@@ -68,7 +68,6 @@ class RepositoryImpl implements Repository {
         .snapshots()
         .map((event) => event.docs
             .map((e) => IDModel(id: e.id, value: e.data()))
-            .where((habit) => !habit.value.archive)
             .toList(growable: false));
   }
 

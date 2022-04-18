@@ -25,8 +25,9 @@ class HabitListBloc extends Cubit<HabitListState> {
 
 class HabitListState {
   final List<IDModel<Habit>> habits;
+  final List<IDModel<Habit>> notArchived;
 
   HabitListState({
     this.habits = const [],
-  });
+  }) : notArchived = habits.where((habit) => !habit.value.archive).toList(growable: false);
 }

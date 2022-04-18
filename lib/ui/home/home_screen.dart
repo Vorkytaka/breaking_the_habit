@@ -181,11 +181,11 @@ class _HabitsList extends StatelessWidget {
           builder: (context, state) => ListView.separated(
             shrinkWrap: true,
             physics: const ScrollPhysics(),
-            itemCount: state.habits.length,
+            itemCount: state.notArchived.length,
             separatorBuilder: (context, i) => const SizedBox(height: 8),
             itemBuilder: (context, i) => _HabitItem(
-              habit: state.habits[i],
-              onTap: () => showHabitDialog(context: context, habitId: state.habits[i].id),
+              habit: state.notArchived[i],
+              onTap: () => showHabitDialog(context: context, habitId: state.notArchived[i].id),
             ),
           ),
         ),
@@ -340,7 +340,7 @@ class _SelectActivityState extends State<_SelectActivity> {
                       left: 8,
                       right: 8,
                     ),
-                    itemCount: state.habits.length,
+                    itemCount: state.notArchived.length,
                     separatorBuilder: (context, i) => const SizedBox(height: 8),
                     itemBuilder: (context, i) => Material(
                       borderRadius: const BorderRadius.all(Radius.circular(5)),
@@ -348,24 +348,24 @@ class _SelectActivityState extends State<_SelectActivity> {
                       child: ListTile(
                         onTap: () {
                           context.read<Repository>().addActivity(
-                                state.habits[i],
+                                state.notArchived[i],
                                 widget.selectedDate,
                                 time,
                               );
-                          Navigator.of(context).pop([state.habits[i], time]);
+                          Navigator.of(context).pop([state.notArchived[i], time]);
                         },
                         shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
-                        tileColor: state.habits[i].value.color.lighten(70),
+                        tileColor: state.notArchived[i].value.color.lighten(70),
                         leading: Container(
                           width: 24,
                           height: 24,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: state.habits[i].value.color,
+                            color: state.notArchived[i].value.color,
                           ),
                         ),
                         title: Text(
-                          state.habits[i].value.title,
+                          state.notArchived[i].value.title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
