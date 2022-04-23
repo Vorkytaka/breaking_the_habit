@@ -2,25 +2,61 @@ import 'package:flutter/material.dart';
 
 const double _kMenuScreenPadding = 8.0;
 
-const List<Color> _defaultColors = [
+final List<Color> _defaultColors = [
+  Colors.red.shade200,
   Colors.red,
+  Colors.red.shade700,
+  Colors.pink.shade200,
   Colors.pink,
+  Colors.pink.shade700,
+  Colors.purple.shade200,
   Colors.purple,
+  Colors.purple.shade700,
+  Colors.deepPurple.shade200,
   Colors.deepPurple,
+  Colors.deepPurple.shade700,
+  Colors.indigo.shade200,
   Colors.indigo,
+  Colors.indigo.shade700,
+  Colors.blue.shade200,
   Colors.blue,
+  Colors.blue.shade700,
+  Colors.lightBlue.shade200,
   Colors.lightBlue,
+  Colors.lightBlue.shade700,
+  Colors.teal.shade200,
   Colors.teal,
+  Colors.teal.shade700,
+  Colors.green.shade200,
   Colors.green,
+  Colors.green.shade700,
+  Colors.lightGreen.shade200,
   Colors.lightGreen,
+  Colors.lightGreen.shade700,
+  Colors.lime.shade200,
   Colors.lime,
+  Colors.lime.shade700,
+  Colors.yellow.shade200,
   Colors.yellow,
+  Colors.yellow.shade700,
+  Colors.amber.shade200,
   Colors.amber,
+  Colors.amber.shade700,
+  Colors.orange.shade200,
   Colors.orange,
+  Colors.orange.shade700,
+  Colors.deepOrange.shade200,
   Colors.deepOrange,
+  Colors.deepOrange.shade700,
+  Colors.brown.shade200,
   Colors.brown,
+  Colors.brown.shade700,
+  Colors.grey.shade200,
   Colors.grey,
+  Colors.grey.shade700,
+  Colors.blueGrey.shade200,
   Colors.blueGrey,
+  Colors.blueGrey.shade700,
 ];
 
 class ColorPicker extends StatelessWidget {
@@ -36,7 +72,7 @@ class ColorPicker extends StatelessWidget {
     final CurveTween opacity = CurveTween(curve: const Interval(0.0, 1.0 / 3.0));
 
     final child = DefaultTabController(
-      length: 2,
+      length: _defaultColors.length ~/ 9,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
