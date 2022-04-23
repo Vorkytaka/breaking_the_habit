@@ -64,7 +64,7 @@ class _NewHabitDialogState extends State<NewHabitDialog> {
               child: Row(
                 children: [
                   ColorPickerButton(
-                    currentColor: _color,
+                    selectedColor: _color,
                     onSelected: (color) => setState(() {
                       _color = color;
                     }),

@@ -89,15 +89,13 @@ class ColorItem extends StatelessWidget {
 }
 
 class ColorPickerButton extends StatefulWidget {
-  final Color currentColor;
+  final Color selectedColor;
   final ValueChanged<Color>? onSelected;
-  final Color? previousColor;
 
   const ColorPickerButton({
     Key? key,
-    required this.currentColor,
+    required this.selectedColor,
     this.onSelected,
-    this.previousColor,
   }) : super(key: key);
 
   @override
@@ -120,7 +118,7 @@ class _ColorPickerButtonState extends State<ColorPickerButton> {
     _showColorPicker(
       context: context,
       position: position,
-      previousColor: widget.previousColor,
+      selectedColor: widget.selectedColor,
     ).then<void>((Color? newValue) {
       if (!mounted) {
         return null;
@@ -139,7 +137,7 @@ class _ColorPickerButtonState extends State<ColorPickerButton> {
       splashRadius: 40,
       onPressed: showButtonMenu,
       icon: ColorItem(
-        color: widget.currentColor,
+        color: widget.selectedColor,
       ),
     );
   }
@@ -147,14 +145,14 @@ class _ColorPickerButtonState extends State<ColorPickerButton> {
 
 class _ColorPicker extends StatelessWidget {
   final _ColorRoute route;
-  final Color? previousColor;
+  final Color? selectedColor;
   final List<Color> colors;
 
   _ColorPicker({
     Key? key,
     required this.route,
     List<Color>? colors,
-    this.previousColor,
+    this.selectedColor,
   })  : colors = colors ?? _defaultColors,
         super(key: key);
 
@@ -164,9 +162,9 @@ class _ColorPicker extends StatelessWidget {
 
     int? selectedItem;
     int? page;
-    if (previousColor != null) {
+    if (selectedColor != null) {
       for (int i = 0; i < colors.length; i++) {
-        if (colors[i] == previousColor) {
+        if (colors[i].value == selectedColor?.value) {
           selectedItem = i;
           page = i ~/ 9;
           break;
@@ -253,12 +251,12 @@ class _ColorPicker extends StatelessWidget {
 class _ColorRoute<T> extends PopupRoute<T> {
   final RelativeRect position;
   final CapturedThemes capturedThemes;
-  final Color? previousColor;
+  final Color? selectedColor;
 
   _ColorRoute({
     required this.position,
     required this.capturedThemes,
-    this.previousColor,
+    this.selectedColor,
   });
 
   @override
@@ -280,7 +278,7 @@ class _ColorRoute<T> extends PopupRoute<T> {
   Widget buildPage(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
     final child = _ColorPicker(
       route: this,
-      previousColor: previousColor,
+      selectedColor: selectedColor,
     );
     final mediaQueryData = MediaQuery.of(context);
     return MediaQuery.removePadding(
@@ -366,14 +364,14 @@ Future<Color?> _showColorPicker({
   required BuildContext context,
   required RelativeRect position,
   bool useRootNavigator = false,
-  Color? previousColor,
+  Color? selectedColor,
 }) async {
   final NavigatorState navigator = Navigator.of(context, rootNavigator: useRootNavigator);
   return Navigator.of(context).push(
     _ColorRoute(
       position: position,
       capturedThemes: InheritedTheme.capture(from: context, to: navigator.context),
-      previousColor: previousColor,
+      selectedColor: selectedColor,
     ),
   );
 }

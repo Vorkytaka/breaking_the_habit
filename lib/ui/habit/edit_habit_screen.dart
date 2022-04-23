@@ -49,7 +49,7 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
         iconTheme: Theme.of(context).iconTheme.copyWith(color: Colors.grey.shade900),
         actions: [
           ColorPickerButton(
-            currentColor: _color,
+            selectedColor: _color,
             onSelected: (color) => setState(() {
               _color = color;
             }),
