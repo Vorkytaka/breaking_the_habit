@@ -215,6 +215,7 @@ class _EditHabitDialogState extends State<_EditHabitDialog> {
                         _color = color;
                         setState(() {});
                       },
+                      previousColor: _color,
                     ),
                     IconButton(
                       onPressed: () async {

@@ -91,11 +91,13 @@ class ColorItem extends StatelessWidget {
 class ColorPickerButton extends StatefulWidget {
   final Color currentColor;
   final ValueChanged<Color>? onSelected;
+  final Color? previousColor;
 
   const ColorPickerButton({
     Key? key,
     required this.currentColor,
     this.onSelected,
+    this.previousColor,
   }) : super(key: key);
 
   @override
@@ -118,6 +120,7 @@ class _ColorPickerButtonState extends State<ColorPickerButton> {
     _showColorPicker(
       context: context,
       position: position,
+      previousColor: widget.previousColor,
     ).then<void>((Color? newValue) {
       if (!mounted) {
         return null;
@@ -144,18 +147,35 @@ class _ColorPickerButtonState extends State<ColorPickerButton> {
 
 class _ColorPicker extends StatelessWidget {
   final _ColorRoute route;
+  final Color? previousColor;
+  final List<Color> colors;
 
-  const _ColorPicker({
+  _ColorPicker({
     Key? key,
     required this.route,
-  }) : super(key: key);
+    List<Color>? colors,
+    this.previousColor,
+  })  : colors = colors ?? _defaultColors,
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final CurveTween opacity = CurveTween(curve: const Interval(0.0, 1.0 / 3.0));
 
+    int? page;
+    if (previousColor != null) {
+      for (int i = 0; i < colors.length; i++) {
+        if (colors[i] == previousColor) {
+          page = i ~/ 9;
+        }
+      }
+    }
+
+    page ??= 0;
+
     final child = DefaultTabController(
-      length: _defaultColors.length ~/ 9,
+      length: colors.length ~/ 9,
+      initialIndex: page,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -179,7 +199,10 @@ class _ColorPicker extends StatelessWidget {
                     child: Builder(builder: (context) {
                       return PageView.builder(
                         physics: const ScrollPhysics(),
-                        itemCount: _defaultColors.length ~/ 9,
+                        controller: PageController(
+                          initialPage: page!,
+                        ),
+                        itemCount: colors.length ~/ 9,
                         onPageChanged: (page) => DefaultTabController.of(context)?.index = page,
                         itemBuilder: (context, i) => GridView.builder(
                           shrinkWrap: true,
@@ -192,9 +215,9 @@ class _ColorPicker extends StatelessWidget {
                             crossAxisSpacing: 8,
                           ),
                           itemBuilder: (context, j) => InkResponse(
-                            onTap: () => Navigator.of(context).pop(_defaultColors[i * 9 + j]),
+                            onTap: () => Navigator.of(context).pop(colors[i * 9 + j]),
                             child: ColorItem(
-                              color: _defaultColors[i * 9 + j],
+                              color: colors[i * 9 + j],
                             ),
                           ),
                         ),
@@ -226,10 +249,12 @@ class _ColorPicker extends StatelessWidget {
 class _ColorRoute<T> extends PopupRoute<T> {
   final RelativeRect position;
   final CapturedThemes capturedThemes;
+  final Color? previousColor;
 
   _ColorRoute({
     required this.position,
     required this.capturedThemes,
+    this.previousColor,
   });
 
   @override
@@ -249,7 +274,10 @@ class _ColorRoute<T> extends PopupRoute<T> {
 
   @override
   Widget buildPage(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
-    final child = _ColorPicker(route: this);
+    final child = _ColorPicker(
+      route: this,
+      previousColor: previousColor,
+    );
     final mediaQueryData = MediaQuery.of(context);
     return MediaQuery.removePadding(
       context: context,
@@ -334,12 +362,14 @@ Future<Color?> _showColorPicker({
   required BuildContext context,
   required RelativeRect position,
   bool useRootNavigator = false,
+  Color? previousColor,
 }) async {
   final NavigatorState navigator = Navigator.of(context, rootNavigator: useRootNavigator);
   return Navigator.of(context).push(
     _ColorRoute(
       position: position,
       capturedThemes: InheritedTheme.capture(from: context, to: navigator.context),
+      previousColor: previousColor,
     ),
   );
 }
