@@ -1,3 +1,4 @@
+import 'package:breaking_the_habit/utils/colors.dart';
 import 'package:flutter/material.dart';
 
 const double _kMenuScreenPadding = 8.0;
@@ -59,10 +60,92 @@ final List<Color> _defaultColors = [
   Colors.blueGrey.shade700,
 ];
 
-class ColorPicker extends StatelessWidget {
-  final ColorRoute route;
+class ColorItem extends StatelessWidget {
+  final Color color;
+  final Color? innerColor;
 
-  const ColorPicker({
+  const ColorItem({
+    Key? key,
+    required this.color,
+    this.innerColor,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final Color inner = innerColor ?? color.lighten(70);
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: color,
+          width: 4,
+        ),
+        color: inner,
+      ),
+    );
+  }
+}
+
+class ColorPickerButton extends StatefulWidget {
+  final Color currentColor;
+  final ValueChanged<Color>? onSelected;
+
+  const ColorPickerButton({
+    Key? key,
+    required this.currentColor,
+    this.onSelected,
+  }) : super(key: key);
+
+  @override
+  State<ColorPickerButton> createState() => _ColorPickerButtonState();
+}
+
+class _ColorPickerButtonState extends State<ColorPickerButton> {
+  void showButtonMenu() {
+    final PopupMenuThemeData popupMenuTheme = PopupMenuTheme.of(context);
+    final RenderBox button = context.findRenderObject()! as RenderBox;
+    final RenderBox overlay = Navigator.of(context).overlay!.context.findRenderObject()! as RenderBox;
+    final RelativeRect position = RelativeRect.fromRect(
+      Rect.fromPoints(
+        button.localToGlobal(Offset.zero, ancestor: overlay),
+        button.localToGlobal(button.size.bottomRight(Offset.zero) + Offset.zero, ancestor: overlay),
+      ),
+      Offset.zero & overlay.size,
+    );
+
+    _showColorPicker(
+      context: context,
+      position: position,
+    ).then<void>((Color? newValue) {
+      if (!mounted) {
+        return null;
+      }
+      if (newValue == null) {
+        // widget.onCanceled?.call();
+        return null;
+      }
+      widget.onSelected?.call(newValue);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      splashRadius: 40,
+      onPressed: showButtonMenu,
+      icon: ColorItem(
+        color: widget.currentColor,
+      ),
+    );
+  }
+}
+
+class _ColorPicker extends StatelessWidget {
+  final _ColorRoute route;
+
+  const _ColorPicker({
     Key? key,
     required this.route,
   }) : super(key: key);
@@ -91,8 +174,8 @@ class ColorPicker extends StatelessWidget {
                   widthFactor: 1,
                   heightFactor: 1,
                   child: SizedBox(
-                    width: 200,
-                    height: 200,
+                    width: 192,
+                    height: 192,
                     child: Builder(builder: (context) {
                       return PageView.builder(
                         physics: const ScrollPhysics(),
@@ -101,7 +184,7 @@ class ColorPicker extends StatelessWidget {
                         itemBuilder: (context, i) => GridView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(24),
                           itemCount: 9,
                           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 3,
@@ -110,11 +193,8 @@ class ColorPicker extends StatelessWidget {
                           ),
                           itemBuilder: (context, j) => InkResponse(
                             onTap: () => Navigator.of(context).pop(_defaultColors[i * 9 + j]),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: _defaultColors[i * 9 + j],
-                              ),
+                            child: ColorItem(
+                              color: _defaultColors[i * 9 + j],
                             ),
                           ),
                         ),
@@ -143,11 +223,11 @@ class ColorPicker extends StatelessWidget {
   }
 }
 
-class ColorRoute<T> extends PopupRoute<T> {
+class _ColorRoute<T> extends PopupRoute<T> {
   final RelativeRect position;
   final CapturedThemes capturedThemes;
 
-  ColorRoute({
+  _ColorRoute({
     required this.position,
     required this.capturedThemes,
   });
@@ -169,7 +249,7 @@ class ColorRoute<T> extends PopupRoute<T> {
 
   @override
   Widget buildPage(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
-    final child = ColorPicker(route: this);
+    final child = _ColorPicker(route: this);
     final mediaQueryData = MediaQuery.of(context);
     return MediaQuery.removePadding(
       context: context,
@@ -250,75 +330,16 @@ class _ColorRouteLayout extends SingleChildLayoutDelegate {
   }
 }
 
-Future<Color?> showColorPicker({
+Future<Color?> _showColorPicker({
   required BuildContext context,
   required RelativeRect position,
   bool useRootNavigator = false,
 }) async {
   final NavigatorState navigator = Navigator.of(context, rootNavigator: useRootNavigator);
   return Navigator.of(context).push(
-    ColorRoute(
+    _ColorRoute(
       position: position,
       capturedThemes: InheritedTheme.capture(from: context, to: navigator.context),
     ),
   );
-}
-
-class ColorPickerButton extends StatefulWidget {
-  final Color currentColor;
-  final ValueChanged<Color>? onSelected;
-
-  const ColorPickerButton({
-    Key? key,
-    required this.currentColor,
-    this.onSelected,
-  }) : super(key: key);
-
-  @override
-  State<ColorPickerButton> createState() => _ColorPickerButtonState();
-}
-
-class _ColorPickerButtonState extends State<ColorPickerButton> {
-  void showButtonMenu() {
-    final PopupMenuThemeData popupMenuTheme = PopupMenuTheme.of(context);
-    final RenderBox button = context.findRenderObject()! as RenderBox;
-    final RenderBox overlay = Navigator.of(context).overlay!.context.findRenderObject()! as RenderBox;
-    final RelativeRect position = RelativeRect.fromRect(
-      Rect.fromPoints(
-        button.localToGlobal(Offset.zero, ancestor: overlay),
-        button.localToGlobal(button.size.bottomRight(Offset.zero) + Offset.zero, ancestor: overlay),
-      ),
-      Offset.zero & overlay.size,
-    );
-
-    showColorPicker(
-      context: context,
-      position: position,
-    ).then<void>((Color? newValue) {
-      if (!mounted) {
-        return null;
-      }
-      if (newValue == null) {
-        // widget.onCanceled?.call();
-        return null;
-      }
-      widget.onSelected?.call(newValue);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      splashRadius: 40,
-      onPressed: showButtonMenu,
-      icon: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: widget.currentColor,
-        ),
-      ),
-    );
-  }
 }
