@@ -48,46 +48,48 @@ class ColorPicker extends StatelessWidget {
             shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32))),
             color: PopupMenuTheme.of(context).color,
             clipBehavior: Clip.hardEdge,
-            child: Align(
-              widthFactor: 1,
-              heightFactor: 1,
-              child: SizedBox(
-                width: 200,
-                height: 200,
-                child: Builder(
-                  builder: (context) {
-                    return PageView.builder(
-                      physics: const ScrollPhysics(),
-                      itemCount: _defaultColors.length ~/ 9,
-                      onPageChanged: (page) => DefaultTabController.of(context)?.index = page,
-                      itemBuilder: (context, i) => GridView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        padding: const EdgeInsets.all(16),
-                        itemCount: 9,
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          mainAxisSpacing: 16,
-                          crossAxisSpacing: 16,
-                        ),
-                        itemBuilder: (context, j) => InkResponse(
-                          onTap: () => Navigator.of(context).pop(_defaultColors[i * 9 + j]),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: _defaultColors[i * 9 + j],
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                Align(
+                  widthFactor: 1,
+                  heightFactor: 1,
+                  child: SizedBox(
+                    width: 200,
+                    height: 200,
+                    child: Builder(builder: (context) {
+                      return PageView.builder(
+                        physics: const ScrollPhysics(),
+                        itemCount: _defaultColors.length ~/ 9,
+                        onPageChanged: (page) => DefaultTabController.of(context)?.index = page,
+                        itemBuilder: (context, i) => GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: const EdgeInsets.all(16),
+                          itemCount: 9,
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            mainAxisSpacing: 8,
+                            crossAxisSpacing: 8,
+                          ),
+                          itemBuilder: (context, j) => InkResponse(
+                            onTap: () => Navigator.of(context).pop(_defaultColors[i * 9 + j]),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: _defaultColors[i * 9 + j],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  }
+                      );
+                    }),
+                  ),
                 ),
-              ),
+                const TabPageSelector(indicatorSize: 8),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          TabPageSelector(),
         ],
       ),
     );
