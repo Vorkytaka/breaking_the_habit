@@ -162,11 +162,14 @@ class _ColorPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     final CurveTween opacity = CurveTween(curve: const Interval(0.0, 1.0 / 3.0));
 
+    int? selectedItem;
     int? page;
     if (previousColor != null) {
       for (int i = 0; i < colors.length; i++) {
         if (colors[i] == previousColor) {
+          selectedItem = i;
           page = i ~/ 9;
+          break;
         }
       }
     }
@@ -218,6 +221,7 @@ class _ColorPicker extends StatelessWidget {
                             onTap: () => Navigator.of(context).pop(colors[i * 9 + j]),
                             child: ColorItem(
                               color: colors[i * 9 + j],
+                              innerColor: (i * 9 + j) == selectedItem ? colors[i * 9 + j] : null,
                             ),
                           ),
                         ),
