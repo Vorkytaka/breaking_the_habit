@@ -149,17 +149,12 @@ class _DraggableHabitsListState extends State<_DraggableHabitsList> {
         maxChildSize: 1,
         // snap: true,
         // todo: check performance
-        builder: (context, controller) => LayoutBuilder(
-          builder: (context, constraints) => SingleChildScrollView(
+        builder: (context, controller) => Material(
+          elevation: isOnTop ? 0 : 8,
+          clipBehavior: Clip.hardEdge,
+          child: SingleChildScrollView(
             controller: controller,
-            child: SizedBox(
-              height: constraints.maxHeight,
-              child: Material(
-                elevation: isOnTop ? 0 : 8,
-                clipBehavior: Clip.hardEdge,
-                child: const _HabitsList(),
-              ),
-            ),
+            child: const _HabitsList(),
           ),
         ),
       ),
