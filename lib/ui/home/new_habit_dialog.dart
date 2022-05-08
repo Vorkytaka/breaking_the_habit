@@ -6,12 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 Future<void> showNewHabitDialog({required BuildContext context}) async {
-  await showModalBottomSheet(
+  await showDialog(
     context: context,
-    enableDrag: false,
-    isScrollControlled: true,
-    isDismissible: true,
-    backgroundColor: Colors.transparent,
+    barrierDismissible: true,
     builder: (context) => const NewHabitDialog(),
   );
 }
@@ -51,68 +48,75 @@ class _NewHabitDialogState extends State<NewHabitDialog> {
         removeBottom: true,
         removeLeft: true,
         context: context,
-        child: Material(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          clipBehavior: Clip.hardEdge,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: 8,
-              horizontal: 8,
-            ),
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: Material(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            clipBehavior: Clip.hardEdge,
             child: Form(
               key: _formKey,
-              child: Row(
-                children: [
-                  ColorPickerOverlayButton(
-                    selectedColor: _color,
-                    offset: const Offset(0, 80),
-                    onSelected: (color) => setState(() {
-                      _color = color;
-                    }),
+              child: ListTile(
+                tileColor: Theme.of(context).colorScheme.surface,
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 8,
+                  horizontal: 16,
+                ),
+                title: TextFormField(
+                  controller: _titleController,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: S.of(context).add_habit__habit_hint,
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _titleController,
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        hintText: S.of(context).add_habit__habit_hint,
+                  maxLines: 1,
+                  autofocus: true,
+                  textCapitalization: TextCapitalization.sentences,
+                  validator: (str) {
+                    if (str == null || str.isEmpty) {
+                      return S.of(context).add_habit__required;
+                    }
+
+                    return null;
+                  },
+                ),
+                leading: CloseButton(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+                trailing: IconTheme.merge(
+                  data: IconThemeData(color: Theme.of(context).colorScheme.onSurface),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      ColorPickerOverlayButton(
+                        selectedColor: _color,
+                        offset: const Offset(80, 80),
+                        onSelected: (color) => setState(() {
+                          _color = color;
+                        }),
                       ),
-                      maxLines: 1,
-                      autofocus: true,
-                      textCapitalization: TextCapitalization.sentences,
-                      validator: (str) {
-                        if (str == null || str.isEmpty) {
-                          return S.of(context).add_habit__required;
-                        }
+                      IconButton(
+                        onPressed: _loading
+                            ? null
+                            : () async {
+                                final form = _formKey.currentState!;
+                                if (form.validate()) {
+                                  setState(() => _loading = true);
 
-                        return null;
-                      },
-                    ),
+                                  final color = _color;
+                                  final title = _titleController.text;
+                                  final habit = Habit(color: color, title: title);
+
+                                  // todo: move to bloc
+                                  await context.read<Repository>().createHabit(habit);
+                                  setState(() => _loading = false);
+                                  Navigator.of(context).pop();
+                                }
+                              },
+                        icon: _loading ? CircularProgressIndicator(color: _color) : const Icon(Icons.done),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 16),
-                  IconButton(
-                    splashRadius: 40,
-                    onPressed: _loading
-                        ? null
-                        : () async {
-                            final form = _formKey.currentState!;
-                            if (form.validate()) {
-                              setState(() => _loading = true);
-
-                              final color = _color;
-                              final title = _titleController.text;
-                              final habit = Habit(color: color, title: title);
-
-                              // todo: move to bloc
-                              await context.read<Repository>().createHabit(habit);
-                              setState(() => _loading = false);
-                              Navigator.of(context).pop();
-                            }
-                          },
-                    icon: _loading ? CircularProgressIndicator(color: _color) : const Icon(Icons.done),
-                  ),
-                ],
+                ),
               ),
             ),
           ),
