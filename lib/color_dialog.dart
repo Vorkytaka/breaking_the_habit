@@ -88,29 +88,166 @@ class ColorItem extends StatelessWidget {
   }
 }
 
-class ColorPickerButton extends StatefulWidget {
+class ColorPickerOverlayField extends FormField<Color> {
+  ColorPickerOverlayField({
+    Key? key,
+    Color? initialValue,
+    FormFieldSetter<Color>? onSaved,
+    FormFieldValidator<Color>? validator,
+    Offset offset = Offset.zero,
+  }) : super(
+          key: key,
+          initialValue: initialValue ?? Colors.blue,
+          onSaved: onSaved,
+          validator: validator,
+          builder: (field) {
+            return ColorPickerOverlayButton(
+              offset: offset,
+              selectedColor: field.value!,
+              onSelected: (color) {
+                field.didChange(color);
+              },
+            );
+          },
+        );
+}
+
+class ColorPickerOverlayButton extends StatefulWidget {
   final Color selectedColor;
+  final Offset offset;
   final ValueChanged<Color>? onSelected;
 
-  const ColorPickerButton({
+  const ColorPickerOverlayButton({
     Key? key,
     required this.selectedColor,
+    this.offset = Offset.zero,
     this.onSelected,
   }) : super(key: key);
 
   @override
-  State<ColorPickerButton> createState() => _ColorPickerButtonState();
+  State<ColorPickerOverlayButton> createState() => _ColorPickerOverlayButtonState();
 }
 
-class _ColorPickerButtonState extends State<ColorPickerButton> {
-  void showButtonMenu() {
-    final PopupMenuThemeData popupMenuTheme = PopupMenuTheme.of(context);
+class _ColorPickerOverlayButtonState extends State<ColorPickerOverlayButton> with TickerProviderStateMixin {
+  AnimationController? controller;
+  late Color _color;
+  OverlayEntry? _entry;
+
+  @override
+  void initState() {
+    super.initState();
+    _color = widget.selectedColor;
+  }
+
+  @override
+  void dispose() {
+    controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        _close();
+        return true;
+      },
+      child: IconButton(
+        splashRadius: 40,
+        onPressed: _open,
+        icon: ColorItem(
+          color: _color,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _open() async {
     final RenderBox button = context.findRenderObject()! as RenderBox;
     final RenderBox overlay = Navigator.of(context).overlay!.context.findRenderObject()! as RenderBox;
     final RelativeRect position = RelativeRect.fromRect(
       Rect.fromPoints(
-        button.localToGlobal(Offset.zero, ancestor: overlay),
-        button.localToGlobal(button.size.bottomRight(Offset.zero) + Offset.zero, ancestor: overlay),
+        button.localToGlobal(widget.offset, ancestor: overlay),
+        button.localToGlobal(button.size.bottomRight(Offset.zero) + widget.offset, ancestor: overlay),
+      ),
+      Offset.zero & overlay.size,
+    );
+
+    controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 250),
+    );
+
+    controller!.forward(from: 0.0);
+
+    _entry = OverlayEntry(
+      builder: (context) => Stack(
+        children: [
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: _close,
+            ),
+          ),
+          CustomSingleChildLayout(
+            delegate: _ColorRouteLayout(
+              position: position,
+              textDirection: Directionality.of(context),
+              padding: MediaQuery.of(context).viewInsets + EdgeInsets.only(bottom: widget.offset.dy),
+            ),
+            child: _ColorPicker(
+              animation: controller!,
+              selectedColor: _color,
+              onTap: (color) {
+                setState(() {
+                  _color = color;
+                  widget.onSelected?.call(_color);
+                  _close();
+                });
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+
+    Overlay.of(context)?.insert(_entry!);
+  }
+
+  Future<void> _close() async {
+    if (_entry == null || !_entry!.mounted || controller!.status == AnimationStatus.reverse) {
+      return;
+    }
+    controller!.reverse(from: 1.0).whenCompleteOrCancel(() {
+      _entry?.remove();
+    });
+  }
+}
+
+class ColorPickerPopupButton extends StatefulWidget {
+  final Color selectedColor;
+  final Offset offset;
+  final ValueChanged<Color>? onSelected;
+
+  const ColorPickerPopupButton({
+    Key? key,
+    required this.selectedColor,
+    this.onSelected,
+    this.offset = Offset.zero,
+  }) : super(key: key);
+
+  @override
+  State<ColorPickerPopupButton> createState() => _ColorPickerPopupButtonState();
+}
+
+class _ColorPickerPopupButtonState extends State<ColorPickerPopupButton> {
+  void showButtonMenu() {
+    // final PopupMenuThemeData popupMenuTheme = PopupMenuTheme.of(context);
+    final RenderBox button = context.findRenderObject()! as RenderBox;
+    final RenderBox overlay = Navigator.of(context).overlay!.context.findRenderObject()! as RenderBox;
+    final RelativeRect position = RelativeRect.fromRect(
+      Rect.fromPoints(
+        button.localToGlobal(widget.offset, ancestor: overlay),
+        button.localToGlobal(button.size.bottomRight(Offset.zero) + widget.offset, ancestor: overlay),
       ),
       Offset.zero & overlay.size,
     );
@@ -144,21 +281,33 @@ class _ColorPickerButtonState extends State<ColorPickerButton> {
 }
 
 class _ColorPicker extends StatelessWidget {
-  final _ColorRoute route;
+  final Animation<double> animation;
   final Color? selectedColor;
   final List<Color> colors;
+  final void Function(Color color)? onTap;
+  final double side;
+  final int itemOnLine;
+  final double elevation;
 
   _ColorPicker({
     Key? key,
-    required this.route,
+    required this.animation,
     List<Color>? colors,
     this.selectedColor,
+    this.onTap,
+    this.side = 168,
+    this.itemOnLine = 3,
+    this.elevation = 3,
   })  : colors = colors ?? _defaultColors,
         super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final CurveTween opacity = CurveTween(curve: const Interval(0.0, 1.0 / 3.0));
+    final CurveTween opacity = CurveTween(curve: Curves.easeOut);
+    final Animatable<Offset> offset =
+        Tween<Offset>(begin: const Offset(0, 0.25), end: Offset.zero).chain(CurveTween(curve: Curves.easeOut));
+
+    final itemOnPage = itemOnLine * itemOnLine;
 
     int? selectedItem;
     int? page;
@@ -166,7 +315,7 @@ class _ColorPicker extends StatelessWidget {
       for (int i = 0; i < colors.length; i++) {
         if (colors[i].value == selectedColor?.value) {
           selectedItem = i;
-          page = i ~/ 9;
+          page = i ~/ itemOnPage;
           break;
         }
       }
@@ -174,73 +323,84 @@ class _ColorPicker extends StatelessWidget {
 
     page ??= 0;
 
-    final child = DefaultTabController(
-      length: colors.length ~/ 9,
-      initialIndex: page,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Material(
-            type: MaterialType.card,
-            elevation: PopupMenuTheme.of(context).elevation ?? 8,
-            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32))),
-            color: PopupMenuTheme.of(context).color,
-            clipBehavior: Clip.hardEdge,
-            child: Stack(
-              alignment: Alignment.bottomCenter,
-              children: [
-                Align(
-                  widthFactor: 1,
-                  heightFactor: 1,
-                  child: SizedBox(
-                    width: 192,
-                    height: 192,
-                    child: Builder(builder: (context) {
-                      return PageView.builder(
-                        physics: const ScrollPhysics(),
-                        controller: PageController(
-                          initialPage: page!,
-                        ),
-                        itemCount: colors.length ~/ 9,
-                        onPageChanged: (page) => DefaultTabController.of(context)?.index = page,
-                        itemBuilder: (context, i) => GridView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          padding: const EdgeInsets.all(24),
-                          itemCount: 9,
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            mainAxisSpacing: 8,
-                            crossAxisSpacing: 8,
-                          ),
-                          itemBuilder: (context, j) => InkResponse(
-                            onTap: () => Navigator.of(context).pop(colors[i * 9 + j]),
-                            child: ColorItem(
-                              color: colors[i * 9 + j],
-                              innerColor: (i * 9 + j) == selectedItem ? colors[i * 9 + j] : null,
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-                ),
-                const TabPageSelector(indicatorSize: 8),
-              ],
-            ),
+    final pageCount = (colors.length / itemOnPage).ceil();
+
+    Widget child = Align(
+      widthFactor: 1,
+      heightFactor: 1,
+      child: Builder(builder: (context) {
+        return PageView.builder(
+          physics: const ScrollPhysics(),
+          controller: PageController(
+            initialPage: page!,
           ),
-        ],
+          itemCount: pageCount,
+          onPageChanged: (page) => DefaultTabController.of(context)?.index = page,
+          itemBuilder: (context, i) => GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(18),
+            itemCount: itemOnPage,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: itemOnLine,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+            ),
+            itemBuilder: (context, j) {
+              final index = i * itemOnPage + j;
+
+              if (index >= colors.length) {
+                return const SizedBox.shrink();
+              }
+
+              return InkResponse(
+                onTap: () => onTap?.call(colors[index]),
+                radius: 32,
+                child: ColorItem(
+                  color: colors[index],
+                  innerColor: (index) == selectedItem ? colors[index] : null,
+                ),
+              );
+            },
+          ),
+        );
+      }),
+    );
+
+    child = ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: side,
+        maxHeight: side,
+      ),
+      child: DefaultTabController(
+        length: pageCount,
+        initialIndex: page,
+        child: Material(
+          type: MaterialType.card,
+          elevation: PopupMenuTheme.of(context).elevation ?? elevation,
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(32))),
+          color: PopupMenuTheme.of(context).color,
+          clipBehavior: Clip.hardEdge,
+          child: Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              child,
+              const TabPageSelector(indicatorSize: 6),
+            ],
+          ),
+        ),
       ),
     );
 
     return AnimatedBuilder(
-      animation: route.animation!,
+      animation: animation,
       builder: (context, child) {
         return FadeTransition(
-          opacity: opacity.animate(route.animation!),
-          child: child,
+          opacity: opacity.animate(animation),
+          child: SlideTransition(
+            position: offset.animate(animation),
+            child: child!,
+          ),
         );
       },
       child: child,
@@ -277,8 +437,9 @@ class _ColorRoute<T> extends PopupRoute<T> {
   @override
   Widget buildPage(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
     final child = _ColorPicker(
-      route: this,
+      animation: this.animation!,
       selectedColor: selectedColor,
+      onTap: (color) => Navigator.of(context).pop(color),
     );
     final mediaQueryData = MediaQuery.of(context);
     return MediaQuery.removePadding(

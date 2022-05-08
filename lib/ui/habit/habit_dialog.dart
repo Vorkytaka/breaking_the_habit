@@ -209,8 +209,9 @@ class _EditHabitDialogState extends State<_EditHabitDialog> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    ColorPickerButton(
+                    ColorPickerOverlayButton(
                       selectedColor: _color,
+                      offset: const Offset(80, 80),
                       onSelected: (color) {
                         _color = color;
                         setState(() {});

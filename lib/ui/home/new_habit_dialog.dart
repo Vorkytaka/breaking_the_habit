@@ -63,8 +63,9 @@ class _NewHabitDialogState extends State<NewHabitDialog> {
               key: _formKey,
               child: Row(
                 children: [
-                  ColorPickerButton(
+                  ColorPickerOverlayButton(
                     selectedColor: _color,
+                    offset: const Offset(0, 80),
                     onSelected: (color) => setState(() {
                       _color = color;
                     }),
